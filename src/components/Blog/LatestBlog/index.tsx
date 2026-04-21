@@ -4,6 +4,9 @@ import { getAllPublicPosts } from "@/utils/blogApi";
 import Link from "next/link";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
+// No cache — this component is used inside dynamic pages, so no build-time fetch
+export const revalidate = 0;
+
 const LatestBlog: React.FC = async () => {
   const posts = await getAllPublicPosts();
   const latest = posts.slice(0, 2);

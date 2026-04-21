@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   title: "Blog | GoldenLife Victors",
 };
 
+// Force dynamic rendering — prevents Vercel from trying to statically
+// generate this page at build time (which times out hitting the Render backend)
+export const dynamic = "force-dynamic";
+
 const BlogPage = async () => {
   const [posts, categories, tags] = await Promise.all([
     getAllPublicPosts(),
