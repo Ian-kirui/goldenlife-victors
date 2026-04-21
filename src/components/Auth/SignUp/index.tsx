@@ -7,7 +7,7 @@ import { useContext, useState } from "react";
 import Loader from "@/components/Common/Loader";
 import AuthDialogContext from "@/app/context/AuthDialogContext";
 
-// Signup lives on the blog service, not the auth service
+// Signup lives on the blog service, not the auth services
 const AUTH_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const SignUp = ({ signUpOpen }: { signUpOpen?: any }) => {
