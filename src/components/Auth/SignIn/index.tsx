@@ -2,6 +2,7 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useContext, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import SocialSignIn from "../SocialSignIn";
 import Logo from "@/components/Layout/Header/Logo";
 import AuthDialogContext from "@/app/context/AuthDialogContext";
@@ -13,6 +14,17 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const authDialog = useContext(AuthDialogContext);
+  const router = useRouter();
+
+  // NextAuth puts the originally-requested URL in ?callbackUrl=
+  // This is present when the admin layout redirects to /signin
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+
+  // Guard: never redirect a normal sign-in to an admin route
+  // (admin access is controlled by roles on the backend)
+  const safeCallbackUrl =
+    callbackUrl.startsWith("/admin") ? "/admin/dashboard" : callbackUrl;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +42,22 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
     if (result?.status === 200) {
       authDialog?.setIsSuccessDialogOpen(true);
       setTimeout(() => authDialog?.setIsSuccessDialogOpen(false), 1100);
-      setTimeout(() => signInOpen?.(false), 1200);
+
+      if (signInOpen) {
+        // Modal mode — close the modal then let the page stay / do its own redirect
+        setTimeout(() => {
+          signInOpen(false);
+          // If there was a callbackUrl (e.g. user tried to reach /admin/dashboard),
+          // push them there after the modal closes
+          if (callbackUrl !== "/") {
+            router.push(safeCallbackUrl);
+          }
+        }, 1200);
+      } else {
+        // Standalone page mode — redirect to where they came from
+        setTimeout(() => router.push(safeCallbackUrl), 1200);
+      }
     } else {
-      // Surface a friendlier message — the raw result.error is "CredentialsSignin"
       setError("Invalid username or password. Please try again.");
       authDialog?.setIsFailedDialogOpen(true);
       setTimeout(() => authDialog?.setIsFailedDialogOpen(false), 1100);
@@ -45,24 +70,19 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
       <div className="mb-10 text-center mx-auto inline-block max-w-[160px]">
         <Logo />
       </div>
-
       <SocialSignIn />
-
       <span className="z-1 relative my-8 block text-center">
         <span className="-z-1 absolute left-0 top-1/2 block h-px w-full bg-border dark:bg-dark_border" />
         <span className="text-body-secondary relative z-10 inline-block bg-white px-3 text-base dark:bg-dark">
           OR
         </span>
       </span>
-
       <form onSubmit={handleSubmit}>
-        {/* Error banner */}
         {error && (
           <div className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
             {error}
           </div>
         )}
-
         <div className="mb-[22px]">
           <input
             type="text"
@@ -73,7 +93,6 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
             className="w-full rounded-md border border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-gray-400 focus:border-primary focus-visible:shadow-none dark:border-border_color dark:text-white dark:focus:border-primary"
           />
         </div>
-
         <div className="mb-[22px]">
           <input
             type="password"
@@ -84,7 +103,6 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
             className="w-full rounded-md border border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-gray-400 focus:border-primary focus-visible:shadow-none dark:border-border_color dark:text-white dark:focus:border-primary"
           />
         </div>
-
         <div className="mb-9">
           <button
             type="submit"
@@ -102,7 +120,6 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
           </button>
         </div>
       </form>
-
       <Link
         href="/"
         className="mb-2 inline-block text-base text-dark hover:text-primary dark:text-white dark:hover:text-primary"
@@ -111,7 +128,7 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
       </Link>
       <p className="text-body-secondary text-base">
         Not a member yet?{" "}
-        <Link href="/" className="text-primary hover:underline">
+        <Link href="/signup" className="text-primary hover:underline">
           Sign Up
         </Link>
       </p>

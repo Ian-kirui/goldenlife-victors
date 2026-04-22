@@ -3,6 +3,13 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import GitHubProvider from 'next-auth/providers/github';
 
+// Use server-only env var (no NEXT_PUBLIC_ prefix) in route handlers
+// Falls back to the public one if only that is set
+const AUTH_BASE =
+  process.env.API_BASE_URL ??
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  '';
+
 const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -22,33 +29,36 @@ const authOptions: NextAuthOptions = {
       async authorize(credentials): Promise<User | null> {
         if (!credentials?.username || !credentials?.password) return null;
 
+        // Debug — remove once confirmed working
+        console.log('[Auth] Signing in against:', `${AUTH_BASE}/api/auth/signin`);
+
         try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/signin`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                username: credentials.username,
-                password: credentials.password,
-              }),
-            }
-          );
+          const res = await fetch(`${AUTH_BASE}/api/auth/signin`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: credentials.username,
+              password: credentials.password,
+            }),
+          });
+
+          // Debug — remove once confirmed working
+          const raw = await res.text();
+          console.log('[Auth] Response status:', res.status, '| body:', raw);
 
           if (!res.ok) return null;
 
-          const data = await res.json();
+          const data = JSON.parse(raw);
 
-          // Adjust field names below if your API response differs
           return {
             id: data.userId ?? data.id ?? credentials.username,
             name: data.username ?? credentials.username,
             email: data.email ?? null,
-            // Store the JWT so we can forward it to the session
             accessToken: data.jwtToken,
-          } as User & { accessToken: string };
+            roles: data.roles ?? [],
+          } as User & { accessToken: string; roles: string[] };
         } catch (error) {
-          console.error('Auth error:', error);
+          console.error('[Auth] Error:', error);
           return null;
         }
       },
@@ -56,30 +66,24 @@ const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    // Persist the accessToken onto the JWT token
     async jwt({ token, user }) {
       if (user) {
-        token.accessToken = (user as User & { accessToken: string }).accessToken;
+        token.accessToken = (user as any).accessToken;
         token.id = user.id;
+        token.roles = (user as any).roles ?? [];
       }
       return token;
     },
-    // Expose the accessToken and id in the client-side session
     async session({ session, token }) {
       session.accessToken = token.accessToken as string;
       session.user.id = token.id as string;
+      (session as any).roles = token.roles ?? [];
       return session;
     },
   },
 
-  pages: {
-    signIn: '/signin', // adjust to match your (auth)/signin route
-  },
-
-  session: {
-    strategy: 'jwt',
-  },
-
+  pages: { signIn: '/signin' },
+  session: { strategy: 'jwt' },
   secret: process.env.NEXTAUTH_SECRET,
 };
 

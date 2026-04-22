@@ -4,16 +4,16 @@ import toast, { Toaster } from "react-hot-toast";
 import SocialSignUp from "../SocialSignUp";
 import Logo from "@/components/Layout/Header/Logo";
 import { useContext, useState } from "react";
-import Loader from "@/components/Common/Loader";
+import { useRouter } from "next/navigation";
 import AuthDialogContext from "@/app/context/AuthDialogContext";
 
-// Signup lives on the blog service, not the auth services
 const AUTH_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const SignUp = ({ signUpOpen }: { signUpOpen?: any }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const authDialog = useContext(AuthDialogContext);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,7 +26,6 @@ const SignUp = ({ signUpOpen }: { signUpOpen?: any }) => {
     const password = data.get("password") as string;
 
     try {
-      // POST {{render_url}}/api/auth/signup
       const res = await fetch(`${AUTH_BASE}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -48,12 +47,23 @@ const SignUp = ({ signUpOpen }: { signUpOpen?: any }) => {
         return;
       }
 
-      toast.success("Account created! You can now sign in.");
+      toast.success("Account created! Please sign in.");
       setLoading(false);
 
       authDialog?.setIsUserRegistered(true);
       setTimeout(() => authDialog?.setIsUserRegistered(false), 1100);
-      setTimeout(() => signUpOpen?.(false), 1200);
+
+      // Close modal if open, then redirect to /signin
+      // Never redirect to admin routes — role assignment is backend-controlled
+      if (signUpOpen) {
+        setTimeout(() => {
+          signUpOpen(false);
+          router.push("/signin");
+        }, 1200);
+      } else {
+        // Standalone page — redirect straight to signin
+        setTimeout(() => router.push("/signin"), 1200);
+      }
     } catch (err: any) {
       setError(err?.message ?? "Something went wrong. Please try again.");
       setLoading(false);
@@ -66,23 +76,19 @@ const SignUp = ({ signUpOpen }: { signUpOpen?: any }) => {
       <div className="mb-10 text-center mx-auto inline-block max-w-[160px]">
         <Logo />
       </div>
-
       <SocialSignUp />
-
       <span className="z-1 relative my-8 block text-center">
         <span className="-z-1 absolute left-0 top-1/2 block h-px w-full bg-border dark:bg-dark_border" />
         <span className="text-body-secondary relative z-10 inline-block bg-white px-3 text-base dark:bg-dark">
           OR
         </span>
       </span>
-
       <form onSubmit={handleSubmit}>
         {error && (
           <div className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
             {error}
           </div>
         )}
-
         <div className="mb-[22px]">
           <input
             type="text"
@@ -93,7 +99,6 @@ const SignUp = ({ signUpOpen }: { signUpOpen?: any }) => {
             className="w-full rounded-md border border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-gray-300 focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
           />
         </div>
-
         <div className="mb-[22px]">
           <input
             type="email"
@@ -103,7 +108,6 @@ const SignUp = ({ signUpOpen }: { signUpOpen?: any }) => {
             className="w-full rounded-md border border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-gray-300 focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
           />
         </div>
-
         <div className="mb-[22px]">
           <input
             type="password"
@@ -114,7 +118,6 @@ const SignUp = ({ signUpOpen }: { signUpOpen?: any }) => {
             className="w-full rounded-md border border-border dark:border-dark_border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-gray-300 focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
           />
         </div>
-
         <div className="mb-9">
           <button
             type="submit"
@@ -132,7 +135,6 @@ const SignUp = ({ signUpOpen }: { signUpOpen?: any }) => {
           </button>
         </div>
       </form>
-
       <p className="text-body-secondary mb-4 text-base">
         By creating an account you agree with our{" "}
         <a href="/#" className="text-primary hover:underline">Privacy</a>{" "}
@@ -140,8 +142,8 @@ const SignUp = ({ signUpOpen }: { signUpOpen?: any }) => {
         <a href="/#" className="text-primary hover:underline">Policy</a>
       </p>
       <p className="text-body-secondary text-base">
-        Already have an account?
-        <Link href="/" className="pl-2 text-primary hover:underline">
+        Already have an account?{" "}
+        <Link href="/signin" className="pl-2 text-primary hover:underline">
           Sign In
         </Link>
       </p>
