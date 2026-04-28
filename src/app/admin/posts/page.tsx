@@ -1,40 +1,74 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { getAdminPosts, updatePost, type UpdatePostPayload } from "@/utils/blogApi";
+import {
+  getAdminPosts,
+  getPublishedPosts,
+  updatePost,
+  type UpdatePostPayload,
+} from "@/utils/blogApi";
 import type { Post } from "@/types/api.types";
 import { formatPostDate } from "@/utils/formatDate";
 import toast, { Toaster } from "react-hot-toast";
 
+type Tab = "ALL" | "PUBLISHED" | "DRAFT";
+
 export default function AdminPostsPage() {
   const { data: session, status } = useSession();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts]     = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"ALL" | "PUBLISHED" | "DRAFT">("ALL");
+  const [search, setSearch]   = useState("");
+  const [tab, setTab]         = useState<Tab>("ALL");
 
   const token = (session as any)?.accessToken as string;
 
+  // Fetch the correct endpoint based on which tab is active
+  const fetchPosts = useCallback(
+    async (activeTab: Tab) => {
+      if (!token) return;
+      setLoading(true);
+      try {
+        let data: Post[] = [];
+        if (activeTab === "ALL" || activeTab === "DRAFT") {
+          // /posts/admin returns all posts including drafts
+          data = await getAdminPosts(token);
+          if (activeTab === "DRAFT") {
+            data = data.filter((p) => p.status === "DRAFT");
+          }
+        } else {
+          // PUBLISHED — use the public endpoint
+          data = await getPublishedPosts();
+        }
+        setPosts(data);
+      } catch {
+        toast.error("Failed to load posts");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [token]
+  );
+
   useEffect(() => {
     if (status !== "authenticated") return;
-    getAdminPosts(token)
-      .then(setPosts)
-      .catch(() => toast.error("Failed to load posts"))
-      .finally(() => setLoading(false));
-  }, [status, token]);
+    fetchPosts(tab);
+  }, [status, tab, fetchPosts]);
 
   const handleToggleStatus = async (post: Post) => {
     setToggling(post.id);
     const newStatus = post.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
     try {
-      const updated = await updatePost(token, post.id, {
+      await updatePost(token, post.id, {
         postStatus: newStatus as UpdatePostPayload["postStatus"],
       });
-      setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, status: updated.status } : p)));
-      toast.success(`Post ${newStatus === "PUBLISHED" ? "published" : "moved to draft"}`);
+      toast.success(
+        newStatus === "PUBLISHED" ? "Post published" : "Moved to draft"
+      );
+      // Re-fetch current tab to reflect the change
+      fetchPosts(tab);
     } catch (e: any) {
       toast.error(e.message ?? "Failed to update post");
     } finally {
@@ -42,9 +76,11 @@ export default function AdminPostsPage() {
     }
   };
 
-  const filtered = posts
-    .filter((p) => filter === "ALL" || p.status === filter)
-    .filter((p) => p.title.toLowerCase().includes(search.toLowerCase()));
+  const filtered = posts.filter((p) =>
+    p.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const tabs: Tab[] = ["ALL", "PUBLISHED", "DRAFT"];
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -55,7 +91,7 @@ export default function AdminPostsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Posts</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {posts.length} total · {posts.filter((p) => p.status === "PUBLISHED").length} published
+            {posts.length} {tab === "ALL" ? "total" : tab.toLowerCase()}
           </p>
         </div>
         <Link
@@ -69,7 +105,7 @@ export default function AdminPostsPage() {
         </Link>
       </div>
 
-      {/* Filters */}
+      {/* Tabs + search */}
       <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="text"
@@ -79,17 +115,17 @@ export default function AdminPostsPage() {
           className="flex-1 px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e2436] text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-primary"
         />
         <div className="flex gap-1 bg-gray-100 dark:bg-[#1e2436] rounded-lg p-1">
-          {(["ALL", "PUBLISHED", "DRAFT"] as const).map((f) => (
+          {tabs.map((t) => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
+              key={t}
+              onClick={() => { setSearch(""); setTab(t); }}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
-                filter === f
+                tab === t
                   ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                   : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
-              {f}
+              {t}
             </button>
           ))}
         </div>
@@ -103,24 +139,22 @@ export default function AdminPostsPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="py-20 text-center text-gray-400 text-sm">
-            {search ? "No posts match your search." : "No posts yet. Create your first post!"}
+            {search
+              ? "No posts match your search."
+              : tab === "DRAFT"
+              ? "No drafts yet."
+              : tab === "PUBLISHED"
+              ? "No published posts yet."
+              : "No posts yet. Create your first post!"}
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-800">
-                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Title
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">
-                  Category
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">
-                  Date
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Status
-                </th>
+                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Title</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Category</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Date</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -128,9 +162,7 @@ export default function AdminPostsPage() {
               {filtered.map((post) => (
                 <tr key={post.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
                   <td className="px-6 py-4">
-                    <p className="font-medium text-gray-900 dark:text-white line-clamp-1">
-                      {post.title}
-                    </p>
+                    <p className="font-medium text-gray-900 dark:text-white line-clamp-1">{post.title}</p>
                     {post.tags && post.tags.length > 0 && (
                       <p className="text-xs text-gray-400 mt-0.5">
                         {post.tags.map((t) => `#${t.name}`).join(" ")}
@@ -147,6 +179,7 @@ export default function AdminPostsPage() {
                     <button
                       onClick={() => handleToggleStatus(post)}
                       disabled={toggling === post.id}
+                      title="Click to toggle status"
                       className={`text-xs font-medium px-2.5 py-1 rounded-full transition-all ${
                         post.status === "PUBLISHED"
                           ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200"
@@ -162,7 +195,7 @@ export default function AdminPostsPage() {
                         href={`/blog/${post.id}`}
                         target="_blank"
                         className="text-gray-400 hover:text-primary transition-colors"
-                        title="View post"
+                        title="View on site"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

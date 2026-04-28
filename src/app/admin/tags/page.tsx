@@ -2,32 +2,30 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { getAllTags, createTags } from "@/utils/blogApi";
+import { getAdminTags, createTags } from "@/utils/blogApi";
 import type { Tag } from "@/types/api.types";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function TagsPage() {
   const { data: session, status } = useSession();
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [tags, setTags]       = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
-  const [input, setInput] = useState("");
+  const [input, setInput]     = useState("");
   const [creating, setCreating] = useState(false);
 
   const token = (session as any)?.accessToken as string;
 
   useEffect(() => {
     if (status !== "authenticated") return;
-    getAllTags()
+    // Use getAdminTags (no-cache) so we always see latest data
+    getAdminTags()
       .then(setTags)
+      .catch(() => toast.error("Failed to load tags"))
       .finally(() => setLoading(false));
   }, [status]);
 
-  // Parse comma-separated tag names
   const parseNames = (raw: string) =>
-    raw
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    raw.split(",").map((s) => s.trim()).filter(Boolean);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,16 +52,12 @@ export default function TagsPage() {
 
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tags</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Manage blog post tags
-        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage blog post tags</p>
       </div>
 
       {/* Create form */}
       <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-          Add Tags
-        </h2>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Add Tags</h2>
         <form onSubmit={handleCreate} className="space-y-3">
           <input
             type="text"
@@ -74,14 +68,10 @@ export default function TagsPage() {
           />
           <p className="text-xs text-gray-400">Separate multiple tags with commas.</p>
 
-          {/* Preview */}
           {preview.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {preview.map((name) => (
-                <span
-                  key={name}
-                  className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full"
-                >
+                <span key={name} className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full">
                   #{name}
                 </span>
               ))}

@@ -7,10 +7,14 @@ import type {
   TagsResponse,
 } from "@/types/api.types";
 
+const BASE =
+  process.env.BLOG_API_BASE_URL ??
+  process.env.NEXT_PUBLIC_BLOG_API_BASE_URL ??
+  "";
 
-const BASE = process.env.NEXT_PUBLIC_BLOG_API_BASE_URL;
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+/** Public fetch with ISR cache — for public-facing pages */
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     next: { revalidate: 60 },
@@ -20,6 +24,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+/** Authenticated fetch — no cache, always fresh */
 async function authFetch<T>(
   path: string,
   token: string,
@@ -42,6 +47,13 @@ async function authFetch<T>(
   return res.json() as Promise<T>;
 }
 
+/** No-cache public fetch — for admin pages that read public endpoints */
+async function freshFetch<T>(path: string): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`API error ${res.status} for ${path}`);
+  return res.json() as Promise<T>;
+}
+
 // ─── Public: Posts ────────────────────────────────────────────────────────────
 
 export async function getAllPublicPosts(): Promise<Post[]> {
@@ -58,7 +70,7 @@ export async function getPublicPostById(id: string): Promise<Post | null> {
   return posts.find((p) => p.id === id) ?? null;
 }
 
-// ─── Public: Categories & Tags ────────────────────────────────────────────────
+// ─── Public: Categories & Tags (cached for site pages) ───────────────────────
 
 export async function getAllCategories(): Promise<Category[]> {
   try {
@@ -76,18 +88,53 @@ export async function getAllTags(): Promise<Tag[]> {
   }
 }
 
+// ─── Admin: Categories & Tags (no-cache for admin pages) ─────────────────────
+
+/** Always-fresh categories for admin — bypasses ISR cache */
+export async function getAdminCategories(): Promise<Category[]> {
+  try {
+    return await freshFetch<CategoriesResponse>("/categories");
+  } catch {
+    return [];
+  }
+}
+
+/** Always-fresh tags for admin — bypasses ISR cache */
+export async function getAdminTags(): Promise<Tag[]> {
+  try {
+    return await freshFetch<TagsResponse>("/tags");
+  } catch {
+    return [];
+  }
+}
+
 // ─── Admin: Posts ─────────────────────────────────────────────────────────────
 
+/** All posts visible to admin (includes DRAFT) */
 export async function getAdminPosts(
   token: string,
   userId?: string
 ): Promise<Post[]> {
-  const query = userId ? `?userId=${userId}` : "";
-  const data = await authFetch<PostsResponse | { content: Post[] }>(
-    `/posts/admin${query}`,
-    token
-  );
-  return Array.isArray(data) ? data : (data as any).content ?? [];
+  try {
+    const query = userId ? `?userId=${userId}` : "";
+    const data = await authFetch<PostsResponse | { content: Post[] }>(
+      `/posts/admin${query}`,
+      token
+    );
+    return Array.isArray(data) ? data : (data as any).content ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** Published posts only — hits the public endpoint */
+export async function getPublishedPosts(): Promise<Post[]> {
+  try {
+    const data = await freshFetch<PostsResponse | { content: Post[] }>("/posts/public");
+    return Array.isArray(data) ? data : (data as any).content ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export interface CreatePostPayload {
@@ -95,7 +142,7 @@ export interface CreatePostPayload {
   content: string;
   categoryId: string;
   tagIds: string[];
-  status: "DRAFT" | "PUBLISHED";
+  postStatus: "DRAFT" | "PUBLISHED";
 }
 
 export async function createPost(
@@ -127,6 +174,10 @@ export async function updatePost(
   });
 }
 
+/**
+ * Upload cover image — must be called AFTER createPost so postId exists.
+ * Do NOT set Content-Type; browser sets it with the correct multipart boundary.
+ */
 export async function uploadPostImage(
   token: string,
   postId: string,
@@ -134,11 +185,13 @@ export async function uploadPostImage(
 ): Promise<Post> {
   const formData = new FormData();
   formData.append("image", imageFile);
-  const res = await fetch(`${BASE}/posts/${postId}/image`, {
+
+  const res = await fetch(`${BASE}/api/v1/posts/${postId}/image`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
+
   if (!res.ok) {
     const body = await res.json().catch(() => null);
     throw new Error(body?.message ?? `Image upload failed: ${res.status}`);

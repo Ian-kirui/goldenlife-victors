@@ -3,14 +3,13 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import GitHubProvider from 'next-auth/providers/github';
 
-// Use server-only env var (no NEXT_PUBLIC_ prefix) in route handlers
-// Falls back to the public one if only that is set
 const AUTH_BASE =
   process.env.API_BASE_URL ??
   process.env.NEXT_PUBLIC_API_BASE_URL ??
   '';
 
-const authOptions: NextAuthOptions = {
+// Exported so server components can call getServerSession(authOptions)
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -28,10 +27,6 @@ const authOptions: NextAuthOptions = {
       },
       async authorize(credentials): Promise<User | null> {
         if (!credentials?.username || !credentials?.password) return null;
-
-        // Debug — remove once confirmed working
-        console.log('[Auth] Signing in against:', `${AUTH_BASE}/api/auth/signin`);
-
         try {
           const res = await fetch(`${AUTH_BASE}/api/auth/signin`, {
             method: 'POST',
@@ -41,15 +36,8 @@ const authOptions: NextAuthOptions = {
               password: credentials.password,
             }),
           });
-
-          // Debug — remove once confirmed working
-          const raw = await res.text();
-          console.log('[Auth] Response status:', res.status, '| body:', raw);
-
           if (!res.ok) return null;
-
-          const data = JSON.parse(raw);
-
+          const data = await res.json();
           return {
             id: data.userId ?? data.id ?? credentials.username,
             name: data.username ?? credentials.username,

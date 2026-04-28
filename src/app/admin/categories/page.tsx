@@ -2,24 +2,26 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { getAllCategories, createCategory, deleteCategory } from "@/utils/blogApi";
+import { getAdminCategories, createCategory, deleteCategory } from "@/utils/blogApi";
 import type { Category } from "@/types/api.types";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function CategoriesPage() {
   const { data: session, status } = useSession();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [newName, setNewName] = useState("");
-  const [creating, setCreating] = useState(false);
+  const [loading, setLoading]       = useState(true);
+  const [newName, setNewName]       = useState("");
+  const [creating, setCreating]     = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const token = (session as any)?.accessToken as string;
 
   useEffect(() => {
     if (status !== "authenticated") return;
-    getAllCategories()
+    // Use getAdminCategories (no-cache) so we always see latest data
+    getAdminCategories()
       .then(setCategories)
+      .catch(() => toast.error("Failed to load categories"))
       .finally(() => setLoading(false));
   }, [status]);
 
@@ -41,7 +43,7 @@ export default function CategoriesPage() {
   };
 
   const handleDelete = async (cat: Category) => {
-    if (!confirm(`Delete category "${cat.name}"? This cannot be undone.`)) return;
+    if (!confirm(`Delete "${cat.name}"? This cannot be undone.`)) return;
     setDeletingId(cat.id);
     try {
       await deleteCategory(token, cat.id);
@@ -60,16 +62,12 @@ export default function CategoriesPage() {
 
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Categories</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Manage blog post categories
-        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage blog post categories</p>
       </div>
 
       {/* Create form */}
       <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-6">
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
-          Add New Category
-        </h2>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Add New Category</h2>
         <form onSubmit={handleCreate} className="flex gap-3">
           <input
             type="text"
@@ -98,6 +96,11 @@ export default function CategoriesPage() {
 
       {/* List */}
       <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            All Categories ({categories.length})
+          </h2>
+        </div>
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -113,18 +116,18 @@ export default function CategoriesPage() {
                 key={cat.id}
                 className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
               >
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-xs font-bold uppercase">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-xs font-bold uppercase shrink-0">
                   {cat.name.charAt(0)}
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{cat.name}</p>
-                  <p className="text-xs text-gray-400">{cat.postCount} posts</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{cat.name}</p>
+                  <p className="text-xs text-gray-400">{cat.postCount} post{cat.postCount !== 1 ? "s" : ""}</p>
                 </div>
                 <button
                   onClick={() => handleDelete(cat)}
-                  disabled={deletingId === cat.id}
-                  className="text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 transition-colors disabled:opacity-40"
-                  title="Delete category"
+                  disabled={deletingId === cat.id || cat.postCount > 0}
+                  title={cat.postCount > 0 ? "Cannot delete — category has posts" : "Delete category"}
+                  className="text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   {deletingId === cat.id ? (
                     <span className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin inline-block" />
