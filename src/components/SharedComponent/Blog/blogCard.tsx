@@ -6,10 +6,29 @@ import type { Post } from "@/types/api.types";
 
 const FALLBACK_IMAGE = "/images/blog/placeholder.jpg"; // add a placeholder to /public
 
+// Helper function to strip HTML tags - works on both server and client
+const stripHtmlTags = (html: string): string => {
+  if (!html) return "";
+  return html
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/&nbsp;/g, ' ') // Replace non-breaking spaces
+    .replace(/&amp;/g, '&') // Replace ampersand entities
+    .replace(/&lt;/g, '<') // Replace less-than entities
+    .replace(/&gt;/g, '>') // Replace greater-than entities
+    .replace(/&quot;/g, '"') // Replace quote entities
+    .replace(/&#39;/g, "'") // Replace apostrophe entities
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .trim();
+};
+
 const BlogCard = ({ blog }: { blog: Post }) => {
- const coverImage = blog.imageUrl ?? FALLBACK_IMAGE;
-const date = blog.dateCreated ?? blog.createdAt;
-const excerpt = blog.content ? blog.content.slice(0, 120) + "…" : null;
+  const coverImage = blog.imageUrl ?? FALLBACK_IMAGE;
+  const date = blog.dateCreated ?? blog.createdAt;
+  
+  // Strip HTML tags and get plain text excerpt
+  const excerpt = blog.content 
+    ? stripHtmlTags(blog.content).slice(0, 120) + "…" 
+    : null;
 
   return (
     <Link
