@@ -1,12 +1,9 @@
 import { getAllPublicPosts, getPublicPostById } from "@/utils/blogApi";
-import { format } from "date-fns";
+import { formatPostDate } from "@/utils/formatDate";
 import { notFound } from "next/navigation";
-
-// ─── Metadata ────────────────────────────────────────────────────────────────
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const post = await getPublicPostById(params.slug);
-
   const siteName = process.env.SITE_NAME || "GoldenLife Victors";
   const authorName = process.env.AUTHOR_NAME || "GoldenLife";
 
@@ -15,70 +12,44 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       title: `${post.title || "Single Post Page"} | ${siteName}`,
       author: authorName,
       robots: {
-        index: true,
-        follow: true,
-        nocache: true,
-        googleBot: {
-          index: true,
-          follow: false,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
+        index: true, follow: true, nocache: true,
+        googleBot: { index: true, follow: false, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 },
       },
     };
   }
-
   return {
     title: "Not Found",
     description: "No blog article has been found",
     author: authorName,
     robots: {
-      index: false,
-      follow: false,
-      nocache: false,
-      googleBot: {
-        index: false,
-        follow: false,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-      },
+      index: false, follow: false, nocache: false,
+      googleBot: { index: false, follow: false, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 },
     },
   };
 }
-
-// ─── Static params ────────────────────────────────────────────────────────────
 
 export async function generateStaticParams() {
   const posts = await getAllPublicPosts();
   return posts.map((post) => ({ slug: post.id }));
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
-export default async function BlogHead({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function BlogHead({ params }: { params: { slug: string } }) {
   const post = await getPublicPostById(params.slug);
-
   if (!post) notFound();
 
-  const authorName = post.author?.username ?? "GoldenLife";
+  // API returns author.name (not author.username)
+  const authorName = post.author?.name ?? "GoldenLife";
   const initial = authorName.charAt(0).toUpperCase();
 
   return (
     <section className="pt-44 dark:bg-dark px-4">
       <div className="container mx-auto max-w-[1200px]">
         <div className="grid md:grid-cols-12 grid-cols-1 items-center">
-
-          {/* ── Title & meta ── */}
           <div className="col-span-8">
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-0">
               <span className="text-base text-midnight_text dark:text-white font-medium pr-7 border-r border-solid border-grey dark:border-white w-fit">
-                {format(new Date(post.createdAt), "dd MMM yyyy")}
+                {/* API returns dateCreated (not createdAt) */}
+                {formatPostDate(post.dateCreated)}
               </span>
               {post.category && (
                 <span className="text-base text-midnight_text dark:text-white font-medium sm:pl-7 pl-0 w-fit">
@@ -86,19 +57,13 @@ export default async function BlogHead({
                 </span>
               )}
             </div>
-
             <h2 className="text-midnight_text dark:text-white text-[40px] leading-tight font-bold pt-7">
               {post.title}
             </h2>
-
-            {/* Tags */}
             {post.tags && post.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-4">
                 {post.tags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="text-xs font-medium bg-primary/10 text-primary px-3 py-1 rounded-full"
-                  >
+                  <span key={tag.id} className="text-xs font-medium bg-primary/10 text-primary px-3 py-1 rounded-full">
                     #{tag.name}
                   </span>
                 ))}
@@ -106,9 +71,7 @@ export default async function BlogHead({
             )}
           </div>
 
-          {/* ── Author ── */}
           <div className="flex items-center gap-6 col-span-4 pt-4 md:pt-0">
-            {/* Avatar: initials fallback since API likely has no avatar URL */}
             <div className="flex items-center justify-center w-[84px] h-[84px] rounded-full bg-primary text-white text-3xl font-bold shrink-0">
               {initial}
             </div>

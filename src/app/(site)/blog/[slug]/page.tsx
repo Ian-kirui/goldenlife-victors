@@ -6,13 +6,11 @@ import { formatPostDate } from "@/utils/formatDate";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-// Render on demand — avoids build-time fetch timeouts against Render free tier
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: any) {
   const { slug } = await params;
   const post = await getPublicPostById(slug);
-
   const siteName = process.env.SITE_NAME || "GoldenLife Victors";
   const authorName = process.env.AUTHOR_NAME || "GoldenLife";
 
@@ -21,14 +19,11 @@ export async function generateMetadata({ params }: any) {
       title: `${post.title} | ${siteName}`,
       author: authorName,
       robots: {
-        index: true,
-        follow: true,
-        nocache: true,
+        index: true, follow: true, nocache: true,
         googleBot: { index: true, follow: false, "max-image-preview": "large", "max-snippet": -1 },
       },
     };
   }
-
   return {
     title: "Not Found",
     description: "No blog article has been found",
@@ -36,17 +31,15 @@ export async function generateMetadata({ params }: any) {
   };
 }
 
-// generateStaticParams removed — was causing build timeouts on Vercel
-// because Render's free tier spins down and takes 30-50s to wake up
-
 export default async function Post({ params }: any) {
   const { slug } = await params;
   const post = await getPublicPostById(slug);
 
   if (!post) notFound();
 
-  const coverImage = post.coverImage ?? post.imageUrl ?? null;
-  const authorName = post.author?.username ?? "GoldenLife";
+  // API returns imageUrl (not coverImage) and author.name (not author.username)
+  const coverImage = post.imageUrl ?? null;
+  const authorName = post.author?.name ?? "GoldenLife";
 
   return (
     <>
@@ -56,7 +49,8 @@ export default async function Post({ params }: any) {
             <div className="col-span-8">
               <div className="flex flex-col sm:flex-row">
                 <span className="text-base text-midnight_text font-medium dark:text-white pr-7 border-r border-solid border-grey dark:border-white w-fit">
-                  {formatPostDate(post.createdAt)}
+                  {/* API returns dateCreated, not createdAt */}
+                  {formatPostDate(post.dateCreated)}
                 </span>
                 {post.tags && post.tags.length > 0 && (
                   <span className="text-base text-midnight_text font-medium dark:text-white sm:pl-7 pl-0 w-fit">
@@ -114,8 +108,7 @@ export default async function Post({ params }: any) {
                   {post.tags && post.tags.length > 0 && (
                     <div className="mt-8 flex flex-wrap gap-2">
                       {post.tags.map((tag) => (
-                        <span
-                          key={tag.id}
+                        <span key={tag.id}
                           className="text-sm bg-gray-100 dark:bg-dark_border text-gray-600 dark:text-gray-300 px-3 py-1 rounded-full"
                         >
                           #{tag.name}
@@ -128,9 +121,7 @@ export default async function Post({ params }: any) {
                 <div className="w-full px-4 lg:w-4/12">
                   <div className="-mx-4 mb-8 flex flex-col">
                     <div className="w-full py-12 px-11 bg-white dark:bg-dark shadow-lg border-b-2 border-lightborder dark:border-dark_border rounded-t-lg">
-                      <h2 className="relative mb-5 text-2xl dark:text-white text-black sm:text-3xl">
-                        Share
-                      </h2>
+                      <h2 className="relative mb-5 text-2xl dark:text-white text-black sm:text-3xl">Share</h2>
                       <ShareButtons title={post.title} />
                     </div>
                     <div className="w-full py-12 px-11 bg-white dark:bg-dark shadow-lg rounded-b-lg">

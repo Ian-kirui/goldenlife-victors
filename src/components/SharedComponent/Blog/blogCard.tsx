@@ -7,9 +7,9 @@ import type { Post } from "@/types/api.types";
 const FALLBACK_IMAGE = "/images/blog/placeholder.jpg"; // add a placeholder to /public
 
 const BlogCard = ({ blog }: { blog: Post }) => {
-  const coverImage = blog.coverImage ?? blog.imageUrl ?? FALLBACK_IMAGE;
-  const date = blog.createdAt;
-  const excerpt = blog.excerpt ?? blog.content?.slice(0, 120) + "…";
+ const coverImage = blog.imageUrl ?? FALLBACK_IMAGE;
+const date = blog.dateCreated ?? blog.createdAt;
+const excerpt = blog.content ? blog.content.slice(0, 120) + "…" : null;
 
   return (
     <Link
