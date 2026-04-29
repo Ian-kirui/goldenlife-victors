@@ -14,6 +14,7 @@ import {
 import type { Post, Category, Tag } from "@/types/api.types";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
+import RichTextEditor from "@/components/Admin/RichTextEditor";
 
 export default function EditPostPage() {
   const { data: session, status } = useSession();
@@ -51,8 +52,8 @@ export default function EditPostPage() {
         setContent(found.content);
         setCategoryId(found.category?.id ?? "");
         setSelectedTagIds(found.tags?.map((t) => t.id) ?? []);
-        setPostStatus(found.status as "DRAFT" | "PUBLISHED");
-        setImagePreview(found.coverImage ?? found.imageUrl ?? null);
+        setPostStatus((found.postStatus ?? "DRAFT") as "DRAFT" | "PUBLISHED");
+        setImagePreview(found.imageUrl ?? null);
       }
       setCategories(cats);
       setTags(tgs);
@@ -176,11 +177,10 @@ export default function EditPostPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 Content <span className="text-red-500">*</span>
               </label>
-              <textarea
-                required value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={16}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-gray-900 dark:text-white focus:outline-none focus:border-primary text-sm resize-y font-mono"
+              <RichTextEditor
+                value={content}
+                onChange={setContent}
+                minHeight={400}
               />
             </div>
           </div>

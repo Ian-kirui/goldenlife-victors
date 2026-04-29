@@ -6,13 +6,14 @@ import { useEffect, useState } from "react";
 import {
   createPost,
   uploadPostImage,
-  getAllCategories,
-  getAllTags,
+  getAdminCategories,
+  getAdminTags,
   createTags,
 } from "@/utils/blogApi";
 import type { Category, Tag } from "@/types/api.types";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
+import RichTextEditor from "@/components/Admin/RichTextEditor";
 
 export default function NewPostPage() {
   const { data: session, status } = useSession();
@@ -29,12 +30,14 @@ export default function NewPostPage() {
   const [categories, setCategories]     = useState<Category[]>([]);
   const [tags, setTags]                 = useState<Tag[]>([]);
   const [submitting, setSubmitting]     = useState(false);
+  // Track submission step for feedback
+  const [step, setStep]                 = useState<"idle" | "creating" | "uploading">("idle");
 
   const token = (session as any)?.accessToken as string;
 
   useEffect(() => {
     if (status !== "authenticated") return;
-    Promise.all([getAllCategories(), getAllTags()]).then(([cats, tgs]) => {
+    Promise.all([getAdminCategories(), getAdminTags()]).then(([cats, tgs]) => {
       setCategories(cats);
       setTags(tgs);
     });
@@ -55,6 +58,7 @@ export default function NewPostPage() {
       setTags((prev) => [...prev, ...created]);
       setSelectedTagIds((prev) => [...prev, ...created.map((t) => t.id)]);
       setNewTagInput("");
+      toast.success(`Tag #${name} created`);
     } catch {
       toast.error("Failed to create tag");
     }
@@ -69,40 +73,56 @@ export default function NewPostPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!categoryId) { toast.error("Please select a category"); return; }
+    if (!content || content === "<br>") { toast.error("Content cannot be empty"); return; }
+
     setSubmitting(true);
+    setStep("creating");
 
     try {
-      // Step 1 — create the post, get back the id
+      // Step 1 — Create post
+      // NOTE: create endpoint uses "status" key (backend inconsistency — update uses "postStatus")
       const post = await createPost(token, {
         title,
         content,
         categoryId,
         tagIds: selectedTagIds,
-        postStatus, // ← correct key
+        status: postStatus,
       });
 
-      // Step 2 — upload image using the returned post id
+      // Step 2 — Upload image (separate endpoint, requires post id)
       if (imageFile) {
+        setStep("uploading");
         try {
           await uploadPostImage(token, post.id, imageFile);
         } catch {
-          // Non-fatal — post exists, image can be re-uploaded from edit page
-          toast.error("Post created but image upload failed. Re-upload from the edit page.");
+          // Non-fatal: post created successfully, image can be uploaded from edit page
+          toast.error("Post created but image upload failed — add it from the edit page");
         }
       }
 
-      toast.success("Post created!");
+      toast.success(
+        postStatus === "PUBLISHED" ? "Post published!" : "Draft saved!"
+      );
       router.push("/admin/posts");
     } catch (e: any) {
       toast.error(e.message ?? "Failed to create post");
     } finally {
       setSubmitting(false);
+      setStep("idle");
     }
+  };
+
+  const submitLabel = () => {
+    if (step === "creating") return "Creating post…";
+    if (step === "uploading") return "Uploading image…";
+    return postStatus === "PUBLISHED" ? "Publish Post" : "Save Draft";
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <Toaster />
+
+      {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/admin/posts" className="text-gray-400 hover:text-primary transition-colors">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,9 +136,10 @@ export default function NewPostPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-6">
-        {/* Main content */}
+        {/* ── Main content ── */}
         <div className="lg:col-span-2 space-y-5">
           <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-5">
+            {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 Title <span className="text-red-500">*</span>
@@ -130,34 +151,36 @@ export default function NewPostPage() {
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-primary text-sm"
               />
             </div>
+
+            {/* Rich text editor */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 Content <span className="text-red-500">*</span>
               </label>
-              <textarea
-                required value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Write your post content here… HTML is supported."
-                rows={16}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-primary text-sm resize-y font-mono"
+              <RichTextEditor
+                value={content}
+                onChange={setContent}
+                placeholder="Write your post content here…"
+                minHeight={400}
               />
-              <p className="mt-1 text-xs text-gray-400">HTML is supported and rendered on the post page.</p>
             </div>
           </div>
 
           {/* Cover image */}
           <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Cover Image
-              <span className="ml-2 text-xs text-gray-400 font-normal">(uploaded after post is created)</span>
-            </label>
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Cover Image
+              </label>
+              <span className="text-xs text-gray-400">Uploaded separately after post is created</span>
+            </div>
             {imagePreview ? (
               <div className="relative">
                 <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
                 <button
                   type="button"
                   onClick={() => { setImageFile(null); setImagePreview(null); }}
-                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-600"
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-600 text-lg leading-none"
                 >×</button>
               </div>
             ) : (
@@ -166,14 +189,16 @@ export default function NewPostPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <span className="text-sm text-gray-400">Click to select image</span>
+                <span className="text-xs text-gray-300 mt-1">JPG, PNG, WEBP</span>
                 <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
               </label>
             )}
           </div>
         </div>
 
-        {/* Sidebar */}
+        {/* ── Sidebar ── */}
         <div className="space-y-5">
+          {/* Publish box */}
           <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-5 space-y-4">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Publish</h3>
             <div>
@@ -183,8 +208,8 @@ export default function NewPostPage() {
                 onChange={(e) => setPostStatus(e.target.value as "DRAFT" | "PUBLISHED")}
                 className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161b27] text-gray-900 dark:text-white focus:outline-none focus:border-primary"
               >
-                <option value="DRAFT">Draft</option>
-                <option value="PUBLISHED">Published</option>
+                <option value="DRAFT">Draft — save for later</option>
+                <option value="PUBLISHED">Published — go live now</option>
               </select>
             </div>
             <button
@@ -192,11 +217,14 @@ export default function NewPostPage() {
               className="w-full bg-primary hover:bg-darkprimary disabled:opacity-60 text-white text-sm font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               {submitting ? (
-                <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Saving…</>
-              ) : (
-                postStatus === "PUBLISHED" ? "Publish Post" : "Save Draft"
-              )}
+                <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{submitLabel()}</>
+              ) : submitLabel()}
             </button>
+            {postStatus === "DRAFT" && (
+              <p className="text-xs text-gray-400 text-center">
+                You can publish this draft later from the posts list.
+              </p>
+            )}
           </div>
 
           {/* Category */}
@@ -210,13 +238,13 @@ export default function NewPostPage() {
                 <Link href="/admin/categories" className="text-primary hover:underline">Create one</Link>
               </p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {categories.map((cat) => (
                   <label key={cat.id} className="flex items-center gap-2 cursor-pointer group">
                     <input type="radio" name="category" value={cat.id}
                       checked={categoryId === cat.id} onChange={() => setCategoryId(cat.id)}
                       className="accent-primary" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">
+                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors flex-1">
                       {cat.name}
                     </span>
                     <span className="text-xs text-gray-400">({cat.postCount})</span>
@@ -229,7 +257,7 @@ export default function NewPostPage() {
           {/* Tags */}
           <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-5">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Tags</h3>
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div className="flex flex-wrap gap-2 mb-3 max-h-36 overflow-y-auto">
               {tags.map((tag) => (
                 <button key={tag.id} type="button" onClick={() => toggleTag(tag.id)}
                   className={`text-xs px-2.5 py-1 rounded-full border transition-all ${

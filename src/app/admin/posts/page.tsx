@@ -1,223 +1,289 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState, useCallback } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
-  getAdminPosts,
-  getPublishedPosts,
-  updatePost,
-  type UpdatePostPayload,
+  createPost,
+  uploadPostImage,
+  getAdminCategories,
+  getAdminTags,
+  createTags,
 } from "@/utils/blogApi";
-import type { Post } from "@/types/api.types";
-import { formatPostDate } from "@/utils/formatDate";
+import type { Category, Tag } from "@/types/api.types";
 import toast, { Toaster } from "react-hot-toast";
+import Link from "next/link";
+import RichTextEditor from "@/components/Admin/RichTextEditor";
 
-type Tab = "ALL" | "PUBLISHED" | "DRAFT";
-
-export default function AdminPostsPage() {
+export default function NewPostPage() {
   const { data: session, status } = useSession();
-  const [posts, setPosts]     = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [toggling, setToggling] = useState<string | null>(null);
-  const [search, setSearch]   = useState("");
-  const [tab, setTab]         = useState<Tab>("ALL");
+  const router = useRouter();
+
+  const [title, setTitle]               = useState("");
+  const [content, setContent]           = useState("");
+  const [categoryId, setCategoryId]     = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const [postStatus, setPostStatus]     = useState<"DRAFT" | "PUBLISHED">("DRAFT");
+  const [imageFile, setImageFile]       = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [newTagInput, setNewTagInput]   = useState("");
+  const [categories, setCategories]     = useState<Category[]>([]);
+  const [tags, setTags]                 = useState<Tag[]>([]);
+  const [submitting, setSubmitting]     = useState(false);
+  // Track submission step for feedback
+  const [step, setStep]                 = useState<"idle" | "creating" | "uploading">("idle");
 
   const token = (session as any)?.accessToken as string;
 
-  // Fetch the correct endpoint based on which tab is active
-  const fetchPosts = useCallback(
-    async (activeTab: Tab) => {
-      if (!token) return;
-      setLoading(true);
-      try {
-        let data: Post[] = [];
-        if (activeTab === "ALL" || activeTab === "DRAFT") {
-          // /posts/admin returns all posts including drafts
-          data = await getAdminPosts(token);
-          if (activeTab === "DRAFT") {
-            data = data.filter((p) => p.status === "DRAFT");
-          }
-        } else {
-          // PUBLISHED — use the public endpoint
-          data = await getPublishedPosts();
-        }
-        setPosts(data);
-      } catch {
-        toast.error("Failed to load posts");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [token]
-  );
-
   useEffect(() => {
     if (status !== "authenticated") return;
-    fetchPosts(tab);
-  }, [status, tab, fetchPosts]);
+    Promise.all([getAdminCategories(), getAdminTags()]).then(([cats, tgs]) => {
+      setCategories(cats);
+      setTags(tgs);
+    });
+  }, [status]);
 
-  const handleToggleStatus = async (post: Post) => {
-    setToggling(post.id);
-    const newStatus = post.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleAddTag = async () => {
+    const name = newTagInput.trim();
+    if (!name) return;
     try {
-      await updatePost(token, post.id, {
-        postStatus: newStatus as UpdatePostPayload["postStatus"],
-      });
-      toast.success(
-        newStatus === "PUBLISHED" ? "Post published" : "Moved to draft"
-      );
-      // Re-fetch current tab to reflect the change
-      fetchPosts(tab);
-    } catch (e: any) {
-      toast.error(e.message ?? "Failed to update post");
-    } finally {
-      setToggling(null);
+      const created = await createTags(token, [name]);
+      setTags((prev) => [...prev, ...created]);
+      setSelectedTagIds((prev) => [...prev, ...created.map((t) => t.id)]);
+      setNewTagInput("");
+      toast.success(`Tag #${name} created`);
+    } catch {
+      toast.error("Failed to create tag");
     }
   };
 
-  const filtered = posts.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const toggleTag = (id: string) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
+    );
+  };
 
-  const tabs: Tab[] = ["ALL", "PUBLISHED", "DRAFT"];
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!categoryId) { toast.error("Please select a category"); return; }
+    if (!content || content === "<br>") { toast.error("Content cannot be empty"); return; }
+
+    setSubmitting(true);
+    setStep("creating");
+
+    try {
+      // Step 1 — Create post
+      // NOTE: create endpoint uses "status" key (backend inconsistency — update uses "postStatus")
+      const post = await createPost(token, {
+        title,
+        content,
+        categoryId,
+        tagIds: selectedTagIds,
+        status: postStatus,
+      });
+
+      // Step 2 — Upload image (separate endpoint, requires post id)
+      if (imageFile) {
+        setStep("uploading");
+        try {
+          await uploadPostImage(token, post.id, imageFile);
+        } catch {
+          // Non-fatal: post created successfully, image can be uploaded from edit page
+          toast.error("Post created but image upload failed — add it from the edit page");
+        }
+      }
+
+      toast.success(
+        postStatus === "PUBLISHED" ? "Post published!" : "Draft saved!"
+      );
+      router.push("/admin/posts");
+    } catch (e: any) {
+      toast.error(e.message ?? "Failed to create post");
+    } finally {
+      setSubmitting(false);
+      setStep("idle");
+    }
+  };
+
+  const submitLabel = () => {
+    if (step === "creating") return "Creating post…";
+    if (step === "uploading") return "Uploading image…";
+    return postStatus === "PUBLISHED" ? "Publish Post" : "Save Draft";
+  };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       <Toaster />
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Posts</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {posts.length} {tab === "ALL" ? "total" : tab.toLowerCase()}
-          </p>
-        </div>
-        <Link
-          href="/admin/posts/new"
-          className="flex items-center gap-2 bg-primary hover:bg-darkprimary text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+      <div className="flex items-center gap-4">
+        <Link href="/admin/posts" className="text-gray-400 hover:text-primary transition-colors">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          New Post
         </Link>
-      </div>
-
-      {/* Tabs + search */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <input
-          type="text"
-          placeholder="Search posts…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e2436] text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-primary"
-        />
-        <div className="flex gap-1 bg-gray-100 dark:bg-[#1e2436] rounded-lg p-1">
-          {tabs.map((t) => (
-            <button
-              key={t}
-              onClick={() => { setSearch(""); setTab(t); }}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
-                tab === t
-                  ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">New Post</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Create a new blog post</p>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-6">
+        {/* ── Main content ── */}
+        <div className="lg:col-span-2 space-y-5">
+          <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-5">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text" required value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter post title"
+                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-primary text-sm"
+              />
+            </div>
+
+            {/* Rich text editor */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                Content <span className="text-red-500">*</span>
+              </label>
+              <RichTextEditor
+                value={content}
+                onChange={setContent}
+                placeholder="Write your post content here…"
+                minHeight={400}
+              />
+            </div>
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="py-20 text-center text-gray-400 text-sm">
-            {search
-              ? "No posts match your search."
-              : tab === "DRAFT"
-              ? "No drafts yet."
-              : tab === "PUBLISHED"
-              ? "No published posts yet."
-              : "No posts yet. Create your first post!"}
+
+          {/* Cover image */}
+          <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Cover Image
+              </label>
+              <span className="text-xs text-gray-400">Uploaded separately after post is created</span>
+            </div>
+            {imagePreview ? (
+              <div className="relative">
+                <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+                <button
+                  type="button"
+                  onClick={() => { setImageFile(null); setImagePreview(null); }}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-600 text-lg leading-none"
+                >×</button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center h-36 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                <svg className="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span className="text-sm text-gray-400">Click to select image</span>
+                <span className="text-xs text-gray-300 mt-1">JPG, PNG, WEBP</span>
+                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+              </label>
+            )}
           </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-800">
-                <th className="text-left px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Title</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Category</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Date</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-              {filtered.map((post) => (
-                <tr key={post.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="font-medium text-gray-900 dark:text-white line-clamp-1">{post.title}</p>
-                    {post.tags && post.tags.length > 0 && (
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        {post.tags.map((t) => `#${t.name}`).join(" ")}
-                      </p>
-                    )}
-                  </td>
-                  <td className="px-4 py-4 hidden md:table-cell text-gray-500 dark:text-gray-400">
-                    {post.category?.name ?? "—"}
-                  </td>
-                  <td className="px-4 py-4 hidden lg:table-cell text-gray-400 text-xs">
-                    {formatPostDate(post.createdAt)}
-                  </td>
-                  <td className="px-4 py-4">
-                    <button
-                      onClick={() => handleToggleStatus(post)}
-                      disabled={toggling === post.id}
-                      title="Click to toggle status"
-                      className={`text-xs font-medium px-2.5 py-1 rounded-full transition-all ${
-                        post.status === "PUBLISHED"
-                          ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200"
-                          : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-200"
-                      } ${toggling === post.id ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-                    >
-                      {toggling === post.id ? "…" : post.status}
-                    </button>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3 justify-end">
-                      <Link
-                        href={`/blog/${post.id}`}
-                        target="_blank"
-                        className="text-gray-400 hover:text-primary transition-colors"
-                        title="View on site"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </Link>
-                      <Link
-                        href={`/admin/posts/${post.id}`}
-                        className="text-gray-400 hover:text-primary transition-colors"
-                        title="Edit post"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
+        </div>
+
+        {/* ── Sidebar ── */}
+        <div className="space-y-5">
+          {/* Publish box */}
+          <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-5 space-y-4">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Publish</h3>
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Status</label>
+              <select
+                value={postStatus}
+                onChange={(e) => setPostStatus(e.target.value as "DRAFT" | "PUBLISHED")}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#161b27] text-gray-900 dark:text-white focus:outline-none focus:border-primary"
+              >
+                <option value="DRAFT">Draft — save for later</option>
+                <option value="PUBLISHED">Published — go live now</option>
+              </select>
+            </div>
+            <button
+              type="submit" disabled={submitting}
+              className="w-full bg-primary hover:bg-darkprimary disabled:opacity-60 text-white text-sm font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              {submitting ? (
+                <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{submitLabel()}</>
+              ) : submitLabel()}
+            </button>
+            {postStatus === "DRAFT" && (
+              <p className="text-xs text-gray-400 text-center">
+                You can publish this draft later from the posts list.
+              </p>
+            )}
+          </div>
+
+          {/* Category */}
+          <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              Category <span className="text-red-500">*</span>
+            </h3>
+            {categories.length === 0 ? (
+              <p className="text-xs text-gray-400">
+                No categories yet.{" "}
+                <Link href="/admin/categories" className="text-primary hover:underline">Create one</Link>
+              </p>
+            ) : (
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                {categories.map((cat) => (
+                  <label key={cat.id} className="flex items-center gap-2 cursor-pointer group">
+                    <input type="radio" name="category" value={cat.id}
+                      checked={categoryId === cat.id} onChange={() => setCategoryId(cat.id)}
+                      className="accent-primary" />
+                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors flex-1">
+                      {cat.name}
+                    </span>
+                    <span className="text-xs text-gray-400">({cat.postCount})</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Tags */}
+          <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Tags</h3>
+            <div className="flex flex-wrap gap-2 mb-3 max-h-36 overflow-y-auto">
+              {tags.map((tag) => (
+                <button key={tag.id} type="button" onClick={() => toggleTag(tag.id)}
+                  className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
+                    selectedTagIds.includes(tag.id)
+                      ? "bg-primary border-primary text-white"
+                      : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-primary"
+                  }`}
+                >
+                  #{tag.name}
+                </button>
               ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+            </div>
+            <div className="flex gap-2">
+              <input type="text" value={newTagInput}
+                onChange={(e) => setNewTagInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAddTag(); } }}
+                placeholder="New tag…"
+                className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-primary"
+              />
+              <button type="button" onClick={handleAddTag}
+                className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-lg hover:bg-primary hover:text-white transition-all"
+              >Add</button>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }

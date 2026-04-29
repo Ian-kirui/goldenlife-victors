@@ -1,37 +1,36 @@
-// ─── Tag ────────────────────────────────────────────────────────────────────
+// ─── Tag ─────────────────────────────────────────────────────────────────────
 export interface Tag {
   id: string;
   name: string;
+  postCount?: number;
 }
 
-// ─── Category ────────────────────────────────────────────────────────────────
+// ─── Category ─────────────────────────────────────────────────────────────────
 export interface Category {
   id: string;
   name: string;
   postCount: number;
 }
 
-// ─── Post (public list item) ─────────────────────────────────────────────────
+// ─── Post — matches actual API response shape ──────────────────────────────
 export interface Post {
   id: string;
   title: string;
   content: string;
-  excerpt?: string;
-  coverImage?: string;    // may be a URL returned by the API, or null
-  imageUrl?: string;      // some backends use this key instead
-  status: "DRAFT" | "PUBLISHED" | string;
-  createdAt: string;      // ISO date string
-  updatedAt?: string;
-  category?: Category;
-  tags?: Tag[];
+  imageUrl?: string | null;       // API returns imageUrl (not coverImage)
+  postStatus: "DRAFT" | "PUBLISHED" | string; // API returns postStatus
+  dateCreated?: string;           // API returns dateCreated
+  createdAt?: string;             // fallback if backend changes
+  readingTime?: number;
   author?: {
     id: string;
-    username: string;
-    email?: string;
+    name: string;                 // API returns name (not username)
   };
+  category?: Category;
+  tags?: Tag[];
 }
 
-// ─── API list wrappers (adjust if your backend paginates) ────────────────────
-export type PostsResponse  = Post[];
-export type TagsResponse   = Tag[];
-export type CategoriesResponse = Category[];
+// ─── API list wrappers ────────────────────────────────────────────────────────
+export type PostsResponse       = Post[];
+export type TagsResponse        = Tag[];
+export type CategoriesResponse  = Category[];

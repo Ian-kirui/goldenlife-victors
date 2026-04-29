@@ -1,8 +1,8 @@
-import { format, parseISO, isValid } from "date-fns";
+import { format, parseISO, isValid, parse } from "date-fns";
 
 /**
  * Safely format any date value coming from the API.
- * Returns a fallback string if the value is missing or unparseable.
+ * Handles ISO strings, "yyyy-MM-dd HH:mm:ss" (API format), and Date objects.
  */
 export function formatPostDate(
   date: string | null | undefined,
@@ -10,11 +10,15 @@ export function formatPostDate(
 ): string {
   if (!date) return "—";
 
-  // Try ISO parse first (most APIs return ISO 8601)
-  const parsed = parseISO(date);
-  if (isValid(parsed)) return format(parsed, pattern);
+  // Try ISO 8601 first
+  const iso = parseISO(date);
+  if (isValid(iso)) return format(iso, pattern);
 
-  // Fallback: let the JS Date constructor try
+  // Try API format: "2026-04-22 15:51:24"
+  const custom = parse(date, "yyyy-MM-dd HH:mm:ss", new Date());
+  if (isValid(custom)) return format(custom, pattern);
+
+  // Last resort
   const fallback = new Date(date);
   if (isValid(fallback)) return format(fallback, pattern);
 

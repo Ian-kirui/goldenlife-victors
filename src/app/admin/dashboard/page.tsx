@@ -1,13 +1,13 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/navigation";
-import { getAdminPosts, getAllCategories, getAllTags } from "@/utils/blogApi";
+import { getAdminPosts, getAdminCategories, getAdminTags } from "@/utils/blogApi";
 import Link from "next/link";
+import { formatPostDate } from "@/utils/formatDate";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  // Must pass authOptions so getServerSession can decode the JWT and get accessToken
   const session = await getServerSession(authOptions);
   if (!session) redirect("/signin");
 
@@ -15,16 +15,17 @@ export default async function DashboardPage() {
 
   const [posts, categories, tags] = await Promise.allSettled([
     getAdminPosts(token),
-    getAllCategories(),
-    getAllTags(),
+    getAdminCategories(),
+    getAdminTags(),
   ]);
 
-  const allPosts   = posts.status      === "fulfilled" ? posts.value      : [];
-  const allCats    = categories.status === "fulfilled" ? categories.value : [];
-  const allTags    = tags.status       === "fulfilled" ? tags.value       : [];
+  const allPosts = posts.status      === "fulfilled" ? posts.value      : [];
+  const allCats  = categories.status === "fulfilled" ? categories.value : [];
+  const allTags  = tags.status       === "fulfilled" ? tags.value       : [];
 
-  const published = allPosts.filter((p) => p.status === "PUBLISHED").length;
-  const drafts    = allPosts.filter((p) => p.status === "DRAFT").length;
+  // API returns postStatus (not status)
+  const published = allPosts.filter((p) => p.postStatus === "PUBLISHED").length;
+  const drafts    = allPosts.filter((p) => p.postStatus === "DRAFT").length;
 
   const stats = [
     {
@@ -70,8 +71,7 @@ export default async function DashboardPage() {
             Welcome back — here's what's happening on GoldenLife.
           </p>
         </div>
-        <Link
-          href="/admin/posts/new"
+        <Link href="/admin/posts/new"
           className="flex items-center gap-2 bg-primary hover:bg-darkprimary text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,9 +84,7 @@ export default async function DashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {stats.map((stat) => (
-          <Link
-            key={stat.label}
-            href={stat.href}
+          <Link key={stat.label} href={stat.href}
             className="bg-white dark:bg-[#1e2436] rounded-xl p-5 border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow"
           >
             <div className={`w-10 h-10 rounded-lg ${stat.iconBg} flex items-center justify-center mb-3 ${stat.color}`}>
@@ -107,34 +105,31 @@ export default async function DashboardPage() {
         <div className="divide-y divide-gray-50 dark:divide-gray-800">
           {recentPosts.length === 0 ? (
             <p className="px-6 py-8 text-center text-gray-400 text-sm">No posts yet.</p>
-          ) : (
-            recentPosts.map((post) => (
-              <div key={post.id} className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{post.title}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{post.category?.name ?? "Uncategorised"}</p>
-                </div>
-                <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                  post.status === "PUBLISHED"
-                    ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
-                    : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
-                }`}>
-                  {post.status}
-                </span>
-                <Link href={`/admin/posts/${post.id}`} className="text-xs text-primary hover:underline shrink-0">
-                  Edit
-                </Link>
+          ) : recentPosts.map((post) => (
+            <div key={post.id} className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{post.title}</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {post.category?.name ?? "Uncategorised"} · {formatPostDate(post.dateCreated)}
+                </p>
               </div>
-            ))
-          )}
+              <span className={`text-xs font-medium px-2 py-1 rounded-full shrink-0 ${
+                post.postStatus === "PUBLISHED"
+                  ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+                  : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
+              }`}>
+                {post.postStatus}
+              </span>
+              <Link href={`/admin/posts/${post.id}`} className="text-xs text-primary hover:underline shrink-0">Edit</Link>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Coming soon */}
       <div className="grid md:grid-cols-3 gap-4">
         {["Events", "Programmes", "User Management"].map((section) => (
-          <div
-            key={section}
+          <div key={section}
             className="bg-white dark:bg-[#1e2436] rounded-xl border border-dashed border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[140px]"
           >
             <span className="text-xs font-semibold uppercase tracking-widest text-gray-300 dark:text-gray-600">Coming Soon</span>

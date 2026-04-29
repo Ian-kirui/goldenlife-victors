@@ -14,7 +14,6 @@ const BASE =
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Public fetch with ISR cache — for public-facing pages */
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     next: { revalidate: 60 },
@@ -24,7 +23,6 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-/** Authenticated fetch — no cache, always fresh */
 async function authFetch<T>(
   path: string,
   token: string,
@@ -47,11 +45,27 @@ async function authFetch<T>(
   return res.json() as Promise<T>;
 }
 
-/** No-cache public fetch — for admin pages that read public endpoints */
 async function freshFetch<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { cache: "no-store" });
   if (!res.ok) throw new Error(`API error ${res.status} for ${path}`);
   return res.json() as Promise<T>;
+}
+
+// ─── Normalise post ───────────────────────────────────────────────────────────
+// The API returns `postStatus` and `dateCreated` — normalise so components
+// can use consistent field names without knowing the wire format.
+function normalise(post: any): Post {
+  return {
+    ...post,
+    // Expose postStatus as-is (type updated to match)
+    postStatus: post.postStatus ?? post.status ?? "DRAFT",
+    // Normalise date field
+    dateCreated: post.dateCreated ?? post.createdAt ?? null,
+  };
+}
+
+function normaliseAll(posts: any[]): Post[] {
+  return Array.isArray(posts) ? posts.map(normalise) : [];
 }
 
 // ─── Public: Posts ────────────────────────────────────────────────────────────
@@ -59,7 +73,8 @@ async function freshFetch<T>(path: string): Promise<T> {
 export async function getAllPublicPosts(): Promise<Post[]> {
   try {
     const data = await apiFetch<PostsResponse | { content: Post[] }>("/posts/public");
-    return Array.isArray(data) ? data : (data as any).content ?? [];
+    const raw = Array.isArray(data) ? data : (data as any).content ?? [];
+    return normaliseAll(raw);
   } catch {
     return [];
   }
@@ -70,7 +85,7 @@ export async function getPublicPostById(id: string): Promise<Post | null> {
   return posts.find((p) => p.id === id) ?? null;
 }
 
-// ─── Public: Categories & Tags (cached for site pages) ───────────────────────
+// ─── Public: Categories & Tags ────────────────────────────────────────────────
 
 export async function getAllCategories(): Promise<Category[]> {
   try {
@@ -88,9 +103,8 @@ export async function getAllTags(): Promise<Tag[]> {
   }
 }
 
-// ─── Admin: Categories & Tags (no-cache for admin pages) ─────────────────────
+// ─── Admin: Categories & Tags (no-cache) ─────────────────────────────────────
 
-/** Always-fresh categories for admin — bypasses ISR cache */
 export async function getAdminCategories(): Promise<Category[]> {
   try {
     return await freshFetch<CategoriesResponse>("/categories");
@@ -99,7 +113,6 @@ export async function getAdminCategories(): Promise<Category[]> {
   }
 }
 
-/** Always-fresh tags for admin — bypasses ISR cache */
 export async function getAdminTags(): Promise<Tag[]> {
   try {
     return await freshFetch<TagsResponse>("/tags");
@@ -110,57 +123,66 @@ export async function getAdminTags(): Promise<Tag[]> {
 
 // ─── Admin: Posts ─────────────────────────────────────────────────────────────
 
-/** All posts visible to admin (includes DRAFT) */
 export async function getAdminPosts(
   token: string,
-  userId?: string
+  status?: "DRAFT" | "PUBLISHED"
 ): Promise<Post[]> {
   try {
-    const query = userId ? `?userId=${userId}` : "";
+    // API supports ?status=DRAFT filter
+    const query = status ? `?status=${status}` : "";
     const data = await authFetch<PostsResponse | { content: Post[] }>(
       `/posts/admin${query}`,
       token
     );
-    return Array.isArray(data) ? data : (data as any).content ?? [];
+    const raw = Array.isArray(data) ? data : (data as any).content ?? [];
+    return normaliseAll(raw);
   } catch {
     return [];
   }
 }
 
-/** Published posts only — hits the public endpoint */
 export async function getPublishedPosts(): Promise<Post[]> {
   try {
     const data = await freshFetch<PostsResponse | { content: Post[] }>("/posts/public");
-    return Array.isArray(data) ? data : (data as any).content ?? [];
+    const raw = Array.isArray(data) ? data : (data as any).content ?? [];
+    return normaliseAll(raw);
   } catch {
     return [];
   }
 }
 
+// ─── Create Post ──────────────────────────────────────────────────────────────
+// NOTE: Create endpoint uses "status" (not "postStatus") in the request body.
+// Update endpoint uses "postStatus". This is a backend inconsistency.
+
 export interface CreatePostPayload {
   title: string;
-  content: string;
+  content: string;       // HTML string from rich text editor
   categoryId: string;
   tagIds: string[];
-  postStatus: "DRAFT" | "PUBLISHED";
+  status: "DRAFT" | "PUBLISHED"; // create uses "status"
 }
 
 export async function createPost(
   token: string,
   payload: CreatePostPayload
 ): Promise<Post> {
-  return authFetch<Post>("/posts", token, {
+  const raw = await authFetch<any>("/posts", token, {
     method: "POST",
     body: JSON.stringify(payload),
   });
+  return normalise(raw);
 }
+
+// ─── Update Post ──────────────────────────────────────────────────────────────
+// NOTE: Update endpoint uses "postStatus" (not "status").
 
 export interface UpdatePostPayload {
   title?: string;
   content?: string;
   categoryId?: string;
   tagIds?: string[];
-  postStatus?: "DRAFT" | "PUBLISHED";
+  postStatus?: "DRAFT" | "PUBLISHED"; // update uses "postStatus"
 }
 
 export async function updatePost(
@@ -168,16 +190,17 @@ export async function updatePost(
   postId: string,
   payload: UpdatePostPayload
 ): Promise<Post> {
-  return authFetch<Post>(`/posts/${postId}`, token, {
+  const raw = await authFetch<any>(`/posts/${postId}`, token, {
     method: "PUT",
     body: JSON.stringify(payload),
   });
+  return normalise(raw);
 }
 
-/**
- * Upload cover image — must be called AFTER createPost so postId exists.
- * Do NOT set Content-Type; browser sets it with the correct multipart boundary.
- */
+// ─── Upload Image ─────────────────────────────────────────────────────────────
+// Must be called AFTER createPost — requires the post id.
+// Do NOT set Content-Type; browser sets multipart boundary automatically.
+
 export async function uploadPostImage(
   token: string,
   postId: string,
@@ -196,7 +219,7 @@ export async function uploadPostImage(
     const body = await res.json().catch(() => null);
     throw new Error(body?.message ?? `Image upload failed: ${res.status}`);
   }
-  return res.json();
+  return normalise(await res.json());
 }
 
 // ─── Admin: Categories ────────────────────────────────────────────────────────
