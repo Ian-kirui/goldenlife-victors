@@ -224,7 +224,7 @@ export async function uploadPostImage(
   const formData = new FormData();
   formData.append("image", imageFile);
 
-  const res = await fetch(`${BASE}/api/v1/posts/${postId}/image`, {
+  const res = await fetch(`${BASE}/posts/${postId}/image`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
