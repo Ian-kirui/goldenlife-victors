@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { Metadata } from "next";
 import Hero from '@/components/Home/Hero';
 import Help from '@/components/Home/Help';
@@ -9,6 +9,7 @@ import Newsletter from '@/components/Home/NewsLetter';
 import Testimonial from '@/components/Home/Testimonial';
 import Volunteer from '@/components/SharedComponent/Volunteer';
 import UnauthorizedToast from '@/components/Common/UnauthorizedToast';
+
 export const metadata: Metadata = {
   title: "GoldenLife Victors | Mental Health & Wellness Organization",
   description:
@@ -65,7 +66,10 @@ export default function Home() {
   return (
     <main>
       <Hero />
-      <UnauthorizedToast />
+      {/* Suspense required because UnauthorizedToast uses useSearchParams() */}
+      <Suspense fallback={null}>
+        <UnauthorizedToast />
+      </Suspense>
       <Help />
       <Causes />
       <FutureEvents />
