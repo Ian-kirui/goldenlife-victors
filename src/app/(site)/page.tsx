@@ -8,6 +8,7 @@ import UrgentDonation from '@/components/Home/UrgentDonation';
 import Newsletter from '@/components/Home/NewsLetter';
 import Testimonial from '@/components/Home/Testimonial';
 import Volunteer from '@/components/SharedComponent/Volunteer';
+import UnauthorizedToast from '@/components/Common/UnauthorizedToast';
 export const metadata: Metadata = {
   title: "GoldenLife Victors | Mental Health & Wellness Organization",
   description:
@@ -64,6 +65,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
+      <UnauthorizedToast />
       <Help />
       <Causes />
       <FutureEvents />

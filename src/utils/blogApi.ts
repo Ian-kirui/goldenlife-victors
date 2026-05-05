@@ -80,9 +80,14 @@ export async function getAllPublicPosts(): Promise<Post[]> {
   }
 }
 
+/** Single post by id — uses the dedicated public endpoint */
 export async function getPublicPostById(id: string): Promise<Post | null> {
-  const posts = await getAllPublicPosts();
-  return posts.find((p) => p.id === id) ?? null;
+  try {
+    const raw = await freshFetch<any>(`/posts/public/${id}`);
+    return normalise(raw);
+  } catch {
+    return null;
+  }
 }
 
 // ─── Public: Categories & Tags ────────────────────────────────────────────────
@@ -197,6 +202,16 @@ export async function updatePost(
   return normalise(raw);
 }
 
+/** Delete a post by id — requires admin token */
+export async function deletePost(
+  token: string,
+  postId: string
+): Promise<void> {
+  return authFetch<void>(`/posts/${postId}`, token, {
+    method: "DELETE",
+  });
+}
+
 // ─── Upload Image ─────────────────────────────────────────────────────────────
 // Must be called AFTER createPost — requires the post id.
 // Do NOT set Content-Type; browser sets multipart boundary automatically.
@@ -209,7 +224,7 @@ export async function uploadPostImage(
   const formData = new FormData();
   formData.append("image", imageFile);
 
-  const res = await fetch(`${BASE}/posts/${postId}/image`, {
+  const res = await fetch(`${BASE}/api/v1/posts/${postId}/image`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,

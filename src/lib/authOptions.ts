@@ -37,6 +37,7 @@ export const authOptions: NextAuthOptions = {
           });
           if (!res.ok) return null;
           const data = await res.json();
+          
           return {
             id: data.userId ?? data.id ?? credentials.username,
             name: data.username ?? credentials.username,
@@ -58,6 +59,7 @@ export const authOptions: NextAuthOptions = {
         token.accessToken = (user as any).accessToken;
         token.id = user.id;
         token.roles = (user as any).roles ?? [];
+        console.log("[JWT] roles stored:", token.roles); // ← add this
       }
       return token;
     },
@@ -67,9 +69,11 @@ export const authOptions: NextAuthOptions = {
       (session as any).roles = token.roles ?? [];
       return session;
     },
+    
   },
 
   pages: { signIn: '/signin' },
   session: { strategy: 'jwt' },
   secret: process.env.NEXTAUTH_SECRET,
+  
 };
