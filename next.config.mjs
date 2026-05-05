@@ -6,8 +6,16 @@ const nextConfig = {
         protocol: "https",
         hostname: "golden-life-blog-9351.onrender.com",
       },
+      {
+        protocol: "https",
+        hostname: "*.s3.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.s3.*.amazonaws.com",
+      },
     ],
   },
 }
 
-export default nextConfig
+export default nextConfig;
