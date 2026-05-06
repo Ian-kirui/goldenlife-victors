@@ -41,7 +41,11 @@ async function authFetch<T>(
     const body = await res.json().catch(() => null);
     throw new Error(body?.message ?? `API error ${res.status} for ${path}`);
   }
+  // 204 No Content or empty body — return undefined
   if (res.status === 204) return undefined as T;
+  // Some endpoints (e.g. DELETE) return plain text instead of JSON
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) return undefined as T;
   return res.json() as Promise<T>;
 }
 
@@ -202,14 +206,26 @@ export async function updatePost(
   return normalise(raw);
 }
 
-/** Delete a post by id — requires admin token */
+/** Delete a post by id — requires admin token.
+ *  The API returns plain text ("Post deleted"), not JSON, so we bypass authFetch.
+ */
 export async function deletePost(
   token: string,
   postId: string
 ): Promise<void> {
-  return authFetch<void>(`/posts/${postId}`, token, {
+  const res = await fetch(`${BASE}/posts/${postId}`, {
     method: "DELETE",
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
+  if (!res.ok) {
+    // Try to get an error message — may be text or JSON
+    const body = await res.text().catch(() => "");
+    throw new Error(body || `Delete failed: ${res.status}`);
+  }
+  // Intentionally ignore the response body — it's plain text, not JSON
 }
 
 // ─── Upload Image ─────────────────────────────────────────────────────────────
@@ -224,7 +240,7 @@ export async function uploadPostImage(
   const formData = new FormData();
   formData.append("image", imageFile);
 
-  const res = await fetch(`${BASE}/posts/${postId}/image`, {
+  const res = await fetch(`${BASE}/api/v1/posts/${postId}/image`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,

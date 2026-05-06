@@ -79,8 +79,9 @@ export default function AdminPostsPage() {
     setDeleting(post.id);
     try {
       await deletePost(token, post.id);
+      // Remove from local state immediately — no re-fetch needed
+      setPosts((prev) => prev.filter((p) => p.id !== post.id));
       toast.success("Post deleted");
-      fetchPosts(tab);
     } catch (e: any) {
       toast.error(e.message ?? "Failed to delete post");
     } finally {
