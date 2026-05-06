@@ -15,9 +15,15 @@ import type { Post } from "@/types/api.types";
 import { formatPostDate } from "@/utils/formatDate";
 import toast, { Toaster } from "react-hot-toast";
 
-type Tab = "ALL" | "PUBLISHED" | "DRAFT";
+type Tab = "MY_POSTS" | "PUBLISHED" | "DRAFT";
 
 const PLACEHOLDER = "/images/blog/placeholder.jpg";
+
+const TAB_LABELS: Record<Tab, string> = {
+  MY_POSTS: "My Posts",
+  PUBLISHED: "Published",
+  DRAFT:     "Draft",
+};
 
 export default function AdminPostsPage() {
   const { data: session, status } = useSession();
@@ -26,7 +32,7 @@ export default function AdminPostsPage() {
   const [toggling, setToggling] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [search, setSearch]     = useState("");
-  const [tab, setTab]           = useState<Tab>("ALL");
+  const [tab, setTab]           = useState<Tab>("MY_POSTS");
 
   const token = (session as any)?.accessToken as string;
 
@@ -36,12 +42,12 @@ export default function AdminPostsPage() {
       setLoading(true);
       try {
         let data: Post[] = [];
-        if (activeTab === "ALL") {
-          data = await getAdminPosts(token);
+        if (activeTab === "MY_POSTS") {
+          data = await getAdminPosts(token);           // all my posts (admin endpoint)
         } else if (activeTab === "DRAFT") {
-          data = await getAdminPosts(token, "DRAFT");
+          data = await getAdminPosts(token, "DRAFT");  // my drafts via ?status=DRAFT
         } else {
-          data = await getPublishedPosts();
+          data = await getPublishedPosts();             // all published (public endpoint)
         }
         setPosts(data);
       } catch {
@@ -79,7 +85,6 @@ export default function AdminPostsPage() {
     setDeleting(post.id);
     try {
       await deletePost(token, post.id);
-      // Remove from local state immediately — no re-fetch needed
       setPosts((prev) => prev.filter((p) => p.id !== post.id));
       toast.success("Post deleted");
     } catch (e: any) {
@@ -93,7 +98,7 @@ export default function AdminPostsPage() {
     p.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  const tabs: Tab[] = ["ALL", "PUBLISHED", "DRAFT"];
+  const tabs: Tab[] = ["MY_POSTS", "PUBLISHED", "DRAFT"];
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -104,7 +109,7 @@ export default function AdminPostsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Posts</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {posts.length} {tab === "ALL" ? "total" : tab.toLowerCase()}
+            {posts.length} {TAB_LABELS[tab].toLowerCase()}
           </p>
         </div>
         <Link
@@ -132,13 +137,13 @@ export default function AdminPostsPage() {
             <button
               key={t}
               onClick={() => { setSearch(""); setTab(t); }}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
                 tab === t
                   ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                   : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
-              {t}
+              {TAB_LABELS[t]}
             </button>
           ))}
         </div>
@@ -154,7 +159,7 @@ export default function AdminPostsPage() {
           <div className="py-20 text-center text-gray-400 text-sm">
             {search
               ? "No posts match your search."
-              : tab === "DRAFT" ? "No drafts yet."
+              : tab === "DRAFT"     ? "No drafts yet."
               : tab === "PUBLISHED" ? "No published posts yet."
               : "No posts yet. Create your first post!"}
           </div>
@@ -163,24 +168,13 @@ export default function AdminPostsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-800">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-12">
-                    Image
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Title
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">
-                    Category
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">
-                    Date
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">
-                    Actions
-                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-12">Image</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Title</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Author</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Category</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Date</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -197,12 +191,8 @@ export default function AdminPostsPage() {
                             fill
                             className="object-cover"
                             sizes="48px"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = PLACEHOLDER;
-                            }}
                           />
                         ) : (
-                          // No image indicator
                           <div className="w-full h-full flex items-center justify-center" title="No cover image">
                             <svg className="w-5 h-5 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -214,14 +204,10 @@ export default function AdminPostsPage() {
 
                     {/* Title + tags */}
                     <td className="px-4 py-3">
-                      <p className="font-medium text-gray-900 dark:text-white line-clamp-1 max-w-xs">
-                        {post.title}
-                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white line-clamp-1 max-w-xs">{post.title}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         {!post.imageUrl && (
-                          <span className="text-xs text-amber-500 dark:text-amber-400 font-medium">
-                            ⚠ No image
-                          </span>
+                          <span className="text-xs text-amber-500 dark:text-amber-400 font-medium">⚠ No image</span>
                         )}
                         {post.tags && post.tags.length > 0 && (
                           <p className="text-xs text-gray-400 truncate max-w-[180px]">
@@ -229,6 +215,11 @@ export default function AdminPostsPage() {
                           </p>
                         )}
                       </div>
+                    </td>
+
+                    {/* Author */}
+                    <td className="px-4 py-3 hidden md:table-cell text-gray-500 dark:text-gray-400 text-xs">
+                      {post.author?.name ?? "—"}
                     </td>
 
                     {/* Category */}
@@ -260,36 +251,21 @@ export default function AdminPostsPage() {
                     {/* Actions */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2 justify-end">
-                        {/* View on site */}
-                        <Link
-                          href={`/blog/${post.id}`}
-                          target="_blank"
-                          className="text-gray-400 hover:text-primary transition-colors"
-                          title="View on site"
-                        >
+                        <Link href={`/blog/${post.id}`} target="_blank"
+                          className="text-gray-400 hover:text-primary transition-colors" title="View on site">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                           </svg>
                         </Link>
-
-                        {/* Edit */}
-                        <Link
-                          href={`/admin/posts/${post.id}`}
-                          className="text-gray-400 hover:text-primary transition-colors"
-                          title="Edit post"
-                        >
+                        <Link href={`/admin/posts/${post.id}`}
+                          className="text-gray-400 hover:text-primary transition-colors" title="Edit post">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
                         </Link>
-
-                        {/* Delete */}
-                        <button
-                          onClick={() => handleDelete(post)}
-                          disabled={deleting === post.id}
+                        <button onClick={() => handleDelete(post)} disabled={deleting === post.id}
                           title="Delete post"
-                          className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-40"
-                        >
+                          className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-40">
                           {deleting === post.id ? (
                             <span className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin inline-block" />
                           ) : (
