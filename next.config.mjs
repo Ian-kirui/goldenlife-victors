@@ -8,6 +8,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "www.goldenlifekenya.org",
+      },
+      {
+        protocol: "https",
         hostname: "*.s3.amazonaws.com",
       },
       {
