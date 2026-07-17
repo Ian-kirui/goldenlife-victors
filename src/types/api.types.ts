@@ -34,3 +34,39 @@ export interface Post {
 export type PostsResponse       = Post[];
 export type TagsResponse        = Tag[];
 export type CategoriesResponse  = Category[];
+
+// ─── Event ────────────────────────────────────────────────────────────────────
+export interface Event {
+  id: string;
+  title: string;
+  content: string;
+  imageUrl?: string | null;
+  status: "DRAFT" | "PUBLISHED" | string;
+  meetLink?: string | null;
+  location?: string | null;
+  dateCreated?: string;
+  author?: {
+    id: string;
+    name: string;
+  };
+}
+
+export type EventsResponse = Event[];
+
+// ─── Comment ──────────────────────────────────────────────────────────────────
+export interface Comment {
+  id: string;
+  content: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | string;
+  dateCreated?: string;
+  author?: {
+    id: string;
+    name: string;
+  };
+  post?: {
+    id: string;
+    title: string;
+  };
+}
+
+export type CommentsResponse = Comment[];

@@ -34,7 +34,7 @@ export const ProgrammeData: {
   goal: string;
 }[] = [
   {
-    image: "/images/causes/cause-1.jpg",
+    image: "https://www.goldenlifekenya.org/images/watoto.jpg",
     title: "Roots & Wings Program – School-based Therapy",
     slug: "roots-wings",
     text: "Supporting children, students, parents, and teachers to overcome emotional, behavioral, and social challenges that affect learning and growth.",
@@ -42,7 +42,7 @@ export const ProgrammeData: {
     goal: "$15,000",
   },
   {
-    image: "/images/causes/cause-2.jpg",
+    image: "https://www.goldenlifekenya.org/images/watoto.jpg",
     title: "Active Minds Program – Youth Therapy",
     slug: "active-minds",
     text: "Empowering youths in and out of school to manage emotions, resolve conflicts, and channel their talents into positive personal and social impact.",
@@ -50,7 +50,7 @@ export const ProgrammeData: {
     goal: "$12,000",
   },
   {
-    image: "/images/causes/cause-3.jpg",
+    image: "https://www.goldenlifekenya.org/images/children.jpg",
     title: "Wellness Warriors Program – Male Therapy",
     slug: "wellness-warriors",
     text: "Providing a safe space for men to share their experiences, learn from peers and professionals, and challenge stigma around male mental health.",
@@ -58,7 +58,7 @@ export const ProgrammeData: {
     goal: "$14,000",
   },
   {
-    image: "/images/causes/cause-4.jpg",
+    image: "https://www.goldenlifekenya.org/images/shakahola2.jpg",
     title: "Spiritual Heal Program – Religion-based Therapy",
     slug: "spiritual-heal",
     text: "Integrating mental health support within faith communities to nurture emotional healing, unity, and balance in religious and social life.",
@@ -66,7 +66,7 @@ export const ProgrammeData: {
     goal: "$10,000",
   },
   {
-    image: "/images/causes/cause-5.jpg",
+    image: "https://www.goldenlifekenya.org/images/shakahola.jpg",
     title: "BeyondBump Program – Mother & Child Therapy",
     slug: "beyond-bump",
     text: "Preparing mothers-to-be for childbirth and parenthood through mental health awareness, stress management, and community support circles.",
@@ -74,7 +74,7 @@ export const ProgrammeData: {
     goal: "$18,000",
   },
   {
-    image: "/images/causes/cause-6.jpg",
+    image: "https://www.goldenlifekenya.org/images/3.jpg",
     title: "Empowered Minds Program – Workplace Therapy",
     slug: "empowered-minds",
     text: "Helping employers and employees build healthy work environments through mental health coaching, motivation, and stress management strategies.",
@@ -82,7 +82,7 @@ export const ProgrammeData: {
     goal: "$13,500",
   },
   {
-    image: "/images/causes/cause-7.jpg",
+    image: "https://www.goldenlifekenya.org/images/20221121_123208.jpg",
     title: "Mending Minds Program – Family Therapy",
     slug: "mending-minds",
     text: "Strengthening family bonds through open communication, emotional understanding, and healthy boundary-setting to foster harmony at home.",
@@ -90,7 +90,7 @@ export const ProgrammeData: {
     goal: "$16,000",
   },
   {
-    image: "/images/causes/cause-8.jpg",
+    image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
     title: "Mental Shift Program – Rehabilitation Therapy",
     slug: "mental-shift",
     text: "Offering recovery and rehabilitation for individuals struggling with substance use disorders through detox, therapy, and the 'Adopt an Addict' initiative.",
@@ -98,7 +98,7 @@ export const ProgrammeData: {
     goal: "$25,000",
   },
   {
-    image: "/images/causes/cause-9.jpg",
+    image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
     title: "Global Practices – Innovation & Leadership Hub",
     slug: "global-practices",
     text: "A center for knowledge exchange, training, and global collaboration on mental health and leadership development for individuals and institutions.",
@@ -117,7 +117,7 @@ export const CauseData: {
   goal: string;
 }[] = [
   {
-    image: "/images/causes/cause-1.jpg",
+    image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
     title: "Give medical related help for african children",
     slug: "cause-1",
     text: "You can relay on our amazing features list and also our customer services will be great experience.",
@@ -204,7 +204,7 @@ export const Eventdata: {
   slug: string;
 }[] = [
   {
-    image: "/images/event/event-1.jpg",
+    image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
     title: "You should have eagle’s eye on new trends and techonogies",
     slug: "event-1",
     text: "Business Park, Opp. Corns Sam Restaurant, New Yoark, US",

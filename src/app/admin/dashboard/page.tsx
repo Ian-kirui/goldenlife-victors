@@ -197,7 +197,7 @@ export default async function DashboardPage() {
 
       {/* Coming soon */}
       <div className="grid md:grid-cols-3 gap-4">
-        {["Events", "Programmes", "User Management"].map((section) => (
+        {["Programmes", "User Management"].map((section) => (
           <div key={section}
             className="bg-white dark:bg-[#1e2436] rounded-xl border border-dashed border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[140px]"
           >

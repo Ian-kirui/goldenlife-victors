@@ -121,10 +121,10 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
         </div>
       </form>
       <Link
-        href="/"
+        href="/forgot-password"
         className="mb-2 inline-block text-base text-dark hover:text-primary dark:text-white dark:hover:text-primary"
       >
-        Forget Password?
+        Forgot Password?
       </Link>
       <p className="text-body-secondary text-base">
         Not a member yet?{" "}
