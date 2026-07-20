@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/navigation";
-import { getAdminPosts, getPublishedPosts, getAdminCategories, getAdminTags } from "@/utils/blogApi";
+import { getAdminPosts, getPublishedPosts, getAdminCategories, getAdminTags, getAdminEvents } from "@/utils/blogApi";
 import Link from "next/link";
 import Image from "next/image";
 import { formatPostDate } from "@/utils/formatDate";
@@ -16,17 +16,19 @@ export default async function DashboardPage() {
 
   const token = (session as any).accessToken as string;
 
-  const [myPosts, publishedPosts, categories, tags] = await Promise.allSettled([
+  const [myPosts, publishedPosts, categories, tags, events] = await Promise.allSettled([
     getAdminPosts(token),
-    getPublishedPosts(),       // all published posts from all authors
+    getPublishedPosts(),
     getAdminCategories(),
     getAdminTags(),
+    getAdminEvents(token),
   ]);
 
   const allMyPosts      = myPosts.status      === "fulfilled" ? myPosts.value      : [];
   const allPublished    = publishedPosts.status === "fulfilled" ? publishedPosts.value : [];
   const allCats         = categories.status   === "fulfilled" ? categories.value   : [];
   const allTags         = tags.status         === "fulfilled" ? tags.value         : [];
+  const allEvents       = events.status       === "fulfilled" ? events.value       : [];
 
   const published = allMyPosts.filter((p) => p.postStatus === "PUBLISHED").length;
   const drafts    = allMyPosts.filter((p) => p.postStatus === "DRAFT").length;
@@ -65,6 +67,12 @@ export default async function DashboardPage() {
       iconBg: "bg-pink-100 dark:bg-pink-900/40",
       icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" /></svg>,
     },
+    {
+      label: "Events", value: allEvents.length, href: "/admin/events",
+      color: "bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400",
+      iconBg: "bg-teal-100 dark:bg-teal-900/40",
+      icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>,
+    },
   ];
 
   return (
@@ -88,7 +96,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href}
             className="bg-white dark:bg-[#1e2436] rounded-xl p-5 border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow"
@@ -191,6 +199,38 @@ export default async function DashboardPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+      </div>
+
+
+      {/* Recent events */}
+      <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+          <div>
+            <h2 className="font-semibold text-gray-900 dark:text-white">Recent Events</h2>
+            <p className="text-xs text-gray-400 mt-0.5">{allEvents.length} total</p>
+          </div>
+          <Link href="/admin/events" className="text-sm text-primary hover:underline">View all</Link>
+        </div>
+        {allEvents.length === 0 ? (
+          <p className="px-6 py-8 text-center text-gray-400 text-sm">No events yet.</p>
+        ) : (
+          <div className="divide-y divide-gray-50 dark:divide-gray-800">
+            {allEvents.slice(0, 4).map((ev) => (
+              <div key={ev.id} className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{ev.title}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{ev.location ?? "No location"} · {formatPostDate(ev.dateCreated)}</p>
+                </div>
+                <span className={`text-xs font-medium px-2 py-1 rounded-full shrink-0 ${
+                  ev.status === "PUBLISHED"
+                    ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+                    : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
+                }`}>{ev.status}</span>
+                <Link href={`/admin/events/${ev.id}`} className="text-xs text-primary hover:underline shrink-0">Edit</Link>
+              </div>
+            ))}
           </div>
         )}
       </div>

@@ -5,6 +5,7 @@ import { getPublicPostById } from "@/utils/blogApi";
 import { formatPostDate } from "@/utils/formatDate";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import CommentSection from "@/components/Blog/CommentSection";
 
 export const dynamic = "force-dynamic";
 
@@ -116,6 +117,9 @@ export default async function Post({ params }: any) {
                       ))}
                     </div>
                   )}
+
+                  {/* Comment section */}
+                  <CommentSection postId={post.id} />
                 </div>
 
                 <div className="w-full px-4 lg:w-4/12">

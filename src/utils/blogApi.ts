@@ -435,3 +435,29 @@ export async function getAdminComments(
     return [];
   }
 }
+
+// ─── Comments: Public (create) ────────────────────────────────────────────────
+// NOTE: Create comment endpoint URL is not yet finalised in the backend.
+// Placeholder — update the path once the backend team provides it.
+export async function createComment(
+  token: string,
+  postId: string,
+  content: string
+): Promise<Comment> {
+  return authFetch<Comment>(`/comments`, token, {
+    method: "POST",
+    body: JSON.stringify({ postId, content }),
+  });
+}
+
+// NOTE: Approve/reject endpoint URL not yet finalised.
+export async function moderateComment(
+  token: string,
+  commentId: string,
+  action: "APPROVED" | "REJECTED"
+): Promise<Comment> {
+  return authFetch<Comment>(`/comments/admin/${commentId}`, token, {
+    method: "PUT",
+    body: JSON.stringify({ status: action }),
+  });
+}
