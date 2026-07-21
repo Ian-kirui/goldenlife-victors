@@ -20,8 +20,15 @@ export async function generateMetadata({ params }: any) {
       title: `${post.title} | ${siteName}`,
       author: authorName,
       robots: {
-        index: true, follow: true, nocache: true,
-        googleBot: { index: true, follow: false, "max-image-preview": "large", "max-snippet": -1 },
+        index: true,
+        follow: true,
+        nocache: true,
+        googleBot: {
+          index: true,
+          follow: false,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
       },
     };
   }
@@ -41,7 +48,7 @@ export default async function Post({ params }: any) {
   // API returns imageUrl (not coverImage) and author.name (not author.username)
   const coverImage = post.imageUrl ?? null;
   const authorName = post.author?.name ?? "GoldenLife";
-
+  const comments = post.comments ?? [];
   return (
     <>
       <section className="relative pt-44 dark:bg-dark px-4">
@@ -109,7 +116,8 @@ export default async function Post({ params }: any) {
                   {post.tags && post.tags.length > 0 && (
                     <div className="mt-8 flex flex-wrap gap-2">
                       {post.tags.map((tag) => (
-                        <span key={tag.id}
+                        <span
+                          key={tag.id}
                           className="text-sm bg-gray-100 dark:bg-dark_border text-gray-600 dark:text-gray-300 px-3 py-1 rounded-full"
                         >
                           #{tag.name}
@@ -119,13 +127,15 @@ export default async function Post({ params }: any) {
                   )}
 
                   {/* Comment section */}
-                  <CommentSection postId={post.id} />
+                  <CommentSection postId={post.id} initialComments={comments} />
                 </div>
 
                 <div className="w-full px-4 lg:w-4/12">
                   <div className="-mx-4 mb-8 flex flex-col">
                     <div className="w-full py-12 px-11 bg-white dark:bg-dark shadow-lg border-b-2 border-lightborder dark:border-dark_border rounded-t-lg">
-                      <h2 className="relative mb-5 text-2xl dark:text-white text-black sm:text-3xl">Share</h2>
+                      <h2 className="relative mb-5 text-2xl dark:text-white text-black sm:text-3xl">
+                        Share
+                      </h2>
                       <ShareButtons title={post.title} />
                     </div>
                     <div className="w-full py-12 px-11 bg-white dark:bg-dark shadow-lg rounded-b-lg">
