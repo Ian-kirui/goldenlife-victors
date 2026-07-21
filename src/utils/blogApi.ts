@@ -5,11 +5,20 @@ import type {
   PostsResponse,
   CategoriesResponse,
   TagsResponse,
+  Event,
+  EventsResponse,
+  Comment,
+  CommentsResponse,
 } from "@/types/api.types";
 
 const BASE =
   process.env.BLOG_API_BASE_URL ??
   process.env.NEXT_PUBLIC_BLOG_API_BASE_URL ??
+  "";
+
+const AUTH_BASE =
+  process.env.API_BASE_URL ??
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
   "";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -41,9 +50,7 @@ async function authFetch<T>(
     const body = await res.json().catch(() => null);
     throw new Error(body?.message ?? `API error ${res.status} for ${path}`);
   }
-  // 204 No Content or empty body — return undefined
   if (res.status === 204) return undefined as T;
-  // Some endpoints (e.g. DELETE) return plain text instead of JSON
   const contentType = res.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) return undefined as T;
   return res.json() as Promise<T>;
@@ -55,21 +62,56 @@ async function freshFetch<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-// ─── Normalise post ───────────────────────────────────────────────────────────
-// The API returns `postStatus` and `dateCreated` — normalise so components
-// can use consistent field names without knowing the wire format.
+// ─── Normalise helpers ────────────────────────────────────────────────────────
+
 function normalise(post: any): Post {
   return {
     ...post,
-    // Expose postStatus as-is (type updated to match)
     postStatus: post.postStatus ?? post.status ?? "DRAFT",
-    // Normalise date field
     dateCreated: post.dateCreated ?? post.createdAt ?? null,
   };
 }
 
 function normaliseAll(posts: any[]): Post[] {
   return Array.isArray(posts) ? posts.map(normalise) : [];
+}
+
+/** Events are wrapped: { status, message, data: EventResponse | EventResponse[] } */
+function unwrapEvent(raw: any): Event | null {
+  if (!raw) return null;
+  // If it has a `data` property it's a MessageResponse wrapper
+  const ev = raw.data ?? raw;
+  return ev ?? null;
+}
+
+function unwrapEvents(raw: any): Event[] {
+  if (!raw) return [];
+  const list = raw.data ?? raw;
+  return Array.isArray(list) ? list : [];
+}
+
+// ─── Auth: Forgot / Reset Password ───────────────────────────────────────────
+
+export async function forgotPassword(email: string): Promise<void> {
+  const res = await fetch(
+    `${AUTH_BASE}/api/auth/public/forgot-password?email=${encodeURIComponent(email)}`,
+    { method: "POST", cache: "no-store" }
+  );
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.message ?? `Failed to send reset email (${res.status})`);
+  }
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+  const res = await fetch(
+    `${AUTH_BASE}/api/auth/public/reset-password?token=${encodeURIComponent(token)}&newPassword=${encodeURIComponent(newPassword)}`,
+    { method: "POST", cache: "no-store" }
+  );
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.message ?? `Password reset failed (${res.status})`);
+  }
 }
 
 // ─── Public: Posts ────────────────────────────────────────────────────────────
@@ -84,7 +126,7 @@ export async function getAllPublicPosts(): Promise<Post[]> {
   }
 }
 
-/** Single post by id — uses the dedicated public endpoint */
+/** Uses the dedicated /posts/public/{id} endpoint — returns comments[] too */
 export async function getPublicPostById(id: string): Promise<Post | null> {
   try {
     const raw = await freshFetch<any>(`/posts/public/${id}`);
@@ -112,8 +154,6 @@ export async function getAllTags(): Promise<Tag[]> {
   }
 }
 
-// ─── Admin: Categories & Tags (no-cache) ─────────────────────────────────────
-
 export async function getAdminCategories(): Promise<Category[]> {
   try {
     return await freshFetch<CategoriesResponse>("/categories");
@@ -137,7 +177,6 @@ export async function getAdminPosts(
   status?: "DRAFT" | "PUBLISHED"
 ): Promise<Post[]> {
   try {
-    // API supports ?status=DRAFT filter
     const query = status ? `?status=${status}` : "";
     const data = await authFetch<PostsResponse | { content: Post[] }>(
       `/posts/admin${query}`,
@@ -147,6 +186,15 @@ export async function getAdminPosts(
     return normaliseAll(raw);
   } catch {
     return [];
+  }
+}
+
+export async function getAdminPostById(token: string, id: string): Promise<Post | null> {
+  try {
+    const raw = await authFetch<any>(`/posts/admin/${id}`, token);
+    return normalise(raw);
+  } catch {
+    return null;
   }
 }
 
@@ -160,22 +208,15 @@ export async function getPublishedPosts(): Promise<Post[]> {
   }
 }
 
-// ─── Create Post ──────────────────────────────────────────────────────────────
-// NOTE: Create endpoint uses "status" (not "postStatus") in the request body.
-// Update endpoint uses "postStatus". This is a backend inconsistency.
-
 export interface CreatePostPayload {
   title: string;
-  content: string;       // HTML string from rich text editor
+  content: string;
   categoryId: string;
   tagIds: string[];
-  status: "DRAFT" | "PUBLISHED"; // create uses "status"
+  status: "DRAFT" | "PUBLISHED";
 }
 
-export async function createPost(
-  token: string,
-  payload: CreatePostPayload
-): Promise<Post> {
+export async function createPost(token: string, payload: CreatePostPayload): Promise<Post> {
   const raw = await authFetch<any>("/posts", token, {
     method: "POST",
     body: JSON.stringify(payload),
@@ -183,22 +224,15 @@ export async function createPost(
   return normalise(raw);
 }
 
-// ─── Update Post ──────────────────────────────────────────────────────────────
-// NOTE: Update endpoint uses "postStatus" (not "status").
-
 export interface UpdatePostPayload {
   title?: string;
   content?: string;
   categoryId?: string;
   tagIds?: string[];
-  postStatus?: "DRAFT" | "PUBLISHED"; // update uses "postStatus"
+  postStatus?: "DRAFT" | "PUBLISHED";
 }
 
-export async function updatePost(
-  token: string,
-  postId: string,
-  payload: UpdatePostPayload
-): Promise<Post> {
+export async function updatePost(token: string, postId: string, payload: UpdatePostPayload): Promise<Post> {
   const raw = await authFetch<any>(`/posts/${postId}`, token, {
     method: "PUT",
     body: JSON.stringify(payload),
@@ -206,46 +240,18 @@ export async function updatePost(
   return normalise(raw);
 }
 
-/** Delete a post by id — requires admin token.
- *  The API returns plain text ("Post deleted"), not JSON, so we bypass authFetch.
- */
-export async function deletePost(
-  token: string,
-  postId: string
-): Promise<void> {
-  const res = await fetch(`${BASE}/posts/${postId}`, {
-    method: "DELETE",
-    cache: "no-store",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!res.ok) {
-    // Try to get an error message — may be text or JSON
-    const body = await res.text().catch(() => "");
-    throw new Error(body || `Delete failed: ${res.status}`);
-  }
-  // Intentionally ignore the response body — it's plain text, not JSON
+export async function deletePost(token: string, postId: string): Promise<void> {
+  return authFetch<void>(`/posts/${postId}`, token, { method: "DELETE" });
 }
 
-// ─── Upload Image ─────────────────────────────────────────────────────────────
-// Must be called AFTER createPost — requires the post id.
-// Do NOT set Content-Type; browser sets multipart boundary automatically.
-
-export async function uploadPostImage(
-  token: string,
-  postId: string,
-  imageFile: File
-): Promise<Post> {
+export async function uploadPostImage(token: string, postId: string, imageFile: File): Promise<Post> {
   const formData = new FormData();
   formData.append("image", imageFile);
-
-  const res = await fetch(`${BASE}/api/v1/posts/${postId}/image`, {
+  const res = await fetch(`${BASE}/posts/${postId}/image`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
-
   if (!res.ok) {
     const body = await res.json().catch(() => null);
     throw new Error(body?.message ?? `Image upload failed: ${res.status}`);
@@ -255,74 +261,33 @@ export async function uploadPostImage(
 
 // ─── Admin: Categories ────────────────────────────────────────────────────────
 
-export async function createCategory(
-  token: string,
-  name: string
-): Promise<Category> {
+export async function createCategory(token: string, name: string): Promise<Category> {
   return authFetch<Category>("/categories", token, {
     method: "POST",
     body: JSON.stringify({ name }),
   });
 }
 
-export async function deleteCategory(
-  token: string,
-  categoryId: string
-): Promise<void> {
-  return authFetch<void>(`/categories/${categoryId}`, token, {
-    method: "DELETE",
-  });
+export async function deleteCategory(token: string, categoryId: string): Promise<void> {
+  return authFetch<void>(`/categories/${categoryId}`, token, { method: "DELETE" });
 }
 
 // ─── Admin: Tags ──────────────────────────────────────────────────────────────
 
-export async function createTags(
-  token: string,
-  names: string[]
-): Promise<Tag[]> {
+export async function createTags(token: string, names: string[]): Promise<Tag[]> {
   return authFetch<Tag[]>("/tags", token, {
     method: "POST",
     body: JSON.stringify({ names }),
   });
 }
 
-// ─── Auth: Forgot / Reset Password ───────────────────────────────────────────
-
-const AUTH_BASE =
-  process.env.API_BASE_URL ??
-  process.env.NEXT_PUBLIC_API_BASE_URL ??
-  "";
-
-export async function forgotPassword(email: string): Promise<void> {
-  const res = await fetch(
-    `${AUTH_BASE}/api/auth/public/forgot-password?email=${encodeURIComponent(email)}`,
-    { method: "POST", cache: "no-store" }
-  );
-  if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.message ?? `Failed to send reset email (${res.status})`);
-  }
-}
-
-export async function resetPassword(token: string, newPassword: string): Promise<void> {
-  const res = await fetch(
-    `${AUTH_BASE}/api/auth/public/reset-password?token=${encodeURIComponent(token)}&newPassword=${encodeURIComponent(newPassword)}`,
-    { method: "POST", cache: "no-store" }
-  );
-  if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.message ?? `Password reset failed (${res.status})`);
-  }
-}
-
 // ─── Events: Public ───────────────────────────────────────────────────────────
-
-import type { Event, EventsResponse, Comment, CommentsResponse } from "@/types/api.types";
+// Response shape: { status, message, data: EventResponse[] }
 
 export async function getPublicEvents(): Promise<Event[]> {
   try {
-    const data = await apiFetch<EventsResponse | { content: Event[] }>("/events/public");
-    return Array.isArray(data) ? data : (data as any).content ?? [];
+    const raw = await freshFetch<any>("/events/public");
+    return unwrapEvents(raw);
   } catch {
     return [];
   }
@@ -330,13 +295,43 @@ export async function getPublicEvents(): Promise<Event[]> {
 
 export async function getPublicEventById(id: string): Promise<Event | null> {
   try {
-    return await freshFetch<Event>(`/events/public/${id}`);
+    const raw = await freshFetch<any>(`/events/public/${id}`);
+    return unwrapEvent(raw);
   } catch {
     return null;
   }
 }
 
 // ─── Events: Admin ────────────────────────────────────────────────────────────
+// Response shape: { status, message, data: EventResponse[] }
+
+export async function getAdminEvents(token: string): Promise<Event[]> {
+  try {
+    // Use a direct fetch for GET to avoid Content-Type header issues on some servers
+    const res = await fetch(`${BASE}/events/admin`, {
+      method: "GET",
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      throw new Error(body?.message ?? `API error ${res.status}`);
+    }
+    const raw = await res.json();
+    return unwrapEvents(raw);
+  } catch {
+    return [];
+  }
+}
+
+export async function getAdminEventById(token: string, id: string): Promise<Event | null> {
+  try {
+    const raw = await authFetch<any>(`/events/admin/${id}`, token);
+    return unwrapEvent(raw);
+  } catch {
+    return null;
+  }
+}
 
 export interface CreateEventPayload {
   title: string;
@@ -346,35 +341,12 @@ export interface CreateEventPayload {
   location?: string;
 }
 
-export async function createEvent(
-  token: string,
-  payload: CreateEventPayload
-): Promise<Event> {
-  return authFetch<Event>("/events/admin", token, {
+export async function createEvent(token: string, payload: CreateEventPayload): Promise<Event> {
+  const raw = await authFetch<any>("/events/admin", token, {
     method: "POST",
     body: JSON.stringify(payload),
   });
-}
-
-export async function getAdminEvents(token: string): Promise<Event[]> {
-  try {
-    const data = await authFetch<EventsResponse | { content: Event[] }>(
-      "/events/admin",
-      token,
-      { method: "GET" }
-    );
-    return Array.isArray(data) ? data : (data as any).content ?? [];
-  } catch {
-    return [];
-  }
-}
-
-export async function getAdminEventById(token: string, id: string): Promise<Event | null> {
-  try {
-    return await authFetch<Event>(`/events/admin/${id}`, token);
-  } catch {
-    return null;
-  }
+  return unwrapEvent(raw) as Event;
 }
 
 export async function updateEvent(
@@ -382,20 +354,17 @@ export async function updateEvent(
   id: string,
   payload: Partial<CreateEventPayload>
 ): Promise<Event> {
-  return authFetch<Event>(`/events/admin/${id}`, token, {
+  const raw = await authFetch<any>(`/events/admin/${id}`, token, {
     method: "PUT",
     body: JSON.stringify(payload),
   });
+  return unwrapEvent(raw) as Event;
 }
 
-export async function uploadEventImage(
-  token: string,
-  eventId: string,
-  imageFile: File
-): Promise<Event> {
+export async function uploadEventImage(token: string, eventId: string, imageFile: File): Promise<Event> {
   const formData = new FormData();
   formData.append("image", imageFile);
-  const res = await fetch(`${BASE}/api/v1/events/${eventId}/image`, {
+  const res = await fetch(`${BASE}/events/${eventId}/image`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
@@ -404,18 +373,31 @@ export async function uploadEventImage(
     const body = await res.json().catch(() => null);
     throw new Error(body?.message ?? `Image upload failed: ${res.status}`);
   }
-  return res.json();
+  const raw = await res.json();
+  return unwrapEvent(raw) as Event;
 }
 
-// ─── Posts: Get single post by id (admin) ────────────────────────────────────
+// ─── Comments: Public (no auth needed) ───────────────────────────────────────
+// POST /comments/public/{postId}
+// Body: { content, authorName, authorEmail }
 
-export async function getAdminPostById(token: string, id: string): Promise<Post | null> {
-  try {
-    const raw = await authFetch<any>(`/posts/admin/${id}`, token);
-    return normalise(raw);
-  } catch {
-    return null;
+export async function createComment(
+  postId: string,
+  payload: { content: string; authorName: string; authorEmail: string }
+): Promise<Comment> {
+  const res = await fetch(`${BASE}/comments/public/${postId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.message ?? `Failed to submit comment (${res.status})`);
   }
+  const raw = await res.json();
+  // Response: { status, message, data: CommentDto }
+  return raw.data ?? raw;
 }
 
 // ─── Comments: Admin ─────────────────────────────────────────────────────────
@@ -426,38 +408,22 @@ export async function getAdminComments(
 ): Promise<Comment[]> {
   try {
     const query = status ? `?status=${status}` : "";
-    const data = await authFetch<CommentsResponse | { content: Comment[] }>(
+    const data = await authFetch<CommentsResponse | Comment[]>(
       `/comments/admin${query}`,
       token
     );
-    return Array.isArray(data) ? data : (data as any).content ?? [];
+    return Array.isArray(data) ? data : [];
   } catch {
     return [];
   }
 }
 
-// ─── Comments: Public (create) ────────────────────────────────────────────────
-// NOTE: Create comment endpoint URL is not yet finalised in the backend.
-// Placeholder — update the path once the backend team provides it.
-export async function createComment(
-  token: string,
-  postId: string,
-  content: string
-): Promise<Comment> {
-  return authFetch<Comment>(`/comments`, token, {
-    method: "POST",
-    body: JSON.stringify({ postId, content }),
-  });
+/** PUT /comments/{commentId}/approve */
+export async function approveComment(token: string, commentId: string): Promise<Comment> {
+  return authFetch<Comment>(`/comments/${commentId}/approve`, token, { method: "PUT" });
 }
 
-// NOTE: Approve/reject endpoint URL not yet finalised.
-export async function moderateComment(
-  token: string,
-  commentId: string,
-  action: "APPROVED" | "REJECTED"
-): Promise<Comment> {
-  return authFetch<Comment>(`/comments/admin/${commentId}`, token, {
-    method: "PUT",
-    body: JSON.stringify({ status: action }),
-  });
+/** PUT /comments/{commentId}/reject */
+export async function rejectComment(token: string, commentId: string): Promise<Comment> {
+  return authFetch<Comment>(`/comments/${commentId}/reject`, token, { method: "PUT" });
 }

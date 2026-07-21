@@ -9,12 +9,15 @@ import type { Event } from "@/types/api.types";
 import { formatPostDate } from "@/utils/formatDate";
 import toast, { Toaster } from "react-hot-toast";
 
+type Tab = "ALL" | "PUBLISHED" | "DRAFT";
+
 export default function AdminEventsPage() {
   const { data: session, status } = useSession();
   const [events, setEvents]     = useState<Event[]>([]);
   const [loading, setLoading]   = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
   const [search, setSearch]     = useState("");
+  const [tab, setTab]           = useState<Tab>("ALL");
 
   const token = (session as any)?.accessToken as string;
 
@@ -22,9 +25,11 @@ export default function AdminEventsPage() {
     if (!token) return;
     setLoading(true);
     try {
-      setEvents(await getAdminEvents(token));
-    } catch {
-      toast.error("Failed to load events");
+      const all = await getAdminEvents(token);
+      setEvents(all);
+    } catch (e: any) {
+      console.error("[Events] error:", e);
+      toast.error(e?.message ?? "Failed to load events");
     } finally {
       setLoading(false);
     }
@@ -39,7 +44,13 @@ export default function AdminEventsPage() {
     setToggling(ev.id);
     const newStatus = ev.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
     try {
-      await updateEvent(token, ev.id, { status: newStatus as "DRAFT" | "PUBLISHED" });
+      await updateEvent(token, ev.id, {
+        title: ev.title,
+        content: ev.content,
+        status: newStatus as "DRAFT" | "PUBLISHED",
+        location: ev.location ?? undefined,
+        meetLink: ev.meetLink ?? undefined,
+      });
       toast.success(newStatus === "PUBLISHED" ? "Event published" : "Moved to draft");
       fetchEvents();
     } catch (e: any) {
@@ -49,20 +60,33 @@ export default function AdminEventsPage() {
     }
   };
 
-  const filtered = events.filter((e) =>
+  // Filter by tab first, then search
+  const byTab = tab === "ALL" ? events : events.filter((e) => e.status === tab);
+  const filtered = byTab.filter((e) =>
     e.title.toLowerCase().includes(search.toLowerCase())
   );
+
+  const tabs: Tab[] = ["ALL", "PUBLISHED", "DRAFT"];
+  const counts = {
+    ALL: events.length,
+    PUBLISHED: events.filter((e) => e.status === "PUBLISHED").length,
+    DRAFT: events.filter((e) => e.status === "DRAFT").length,
+  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <Toaster />
 
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Events</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{events.length} total</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {counts.ALL} total · {counts.PUBLISHED} published · {counts.DRAFT} drafts
+          </p>
         </div>
-        <Link href="/admin/events/new"
+        <Link
+          href="/admin/events/new"
           className="flex items-center gap-2 bg-primary hover:bg-darkprimary text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,14 +96,33 @@ export default function AdminEventsPage() {
         </Link>
       </div>
 
-      <input
-        type="text"
-        placeholder="Search events…"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full sm:w-72 px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e2436] text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-primary"
-      />
+      {/* Tabs + search */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          placeholder="Search events…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e2436] text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-primary"
+        />
+        <div className="flex gap-1 bg-gray-100 dark:bg-[#1e2436] rounded-lg p-1">
+          {tabs.map((t) => (
+            <button
+              key={t}
+              onClick={() => { setSearch(""); setTab(t); }}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                tab === t
+                  ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              }`}
+            >
+              {t} <span className="ml-1 opacity-60">({counts[t]})</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
+      {/* Table */}
       <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -87,7 +130,11 @@ export default function AdminEventsPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="py-20 text-center text-gray-400 text-sm">
-            {search ? "No events match your search." : "No events yet. Create your first event!"}
+            {search
+              ? "No events match your search."
+              : tab === "DRAFT" ? "No draft events yet."
+              : tab === "PUBLISHED" ? "No published events yet."
+              : "No events yet. Create your first event!"}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -105,6 +152,7 @@ export default function AdminEventsPage() {
               <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                 {filtered.map((ev) => (
                   <tr key={ev.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+                    {/* Thumbnail */}
                     <td className="px-4 py-3">
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
                         {ev.imageUrl ? (
@@ -118,20 +166,34 @@ export default function AdminEventsPage() {
                         )}
                       </div>
                     </td>
+
+                    {/* Title */}
                     <td className="px-4 py-3">
                       <p className="font-medium text-gray-900 dark:text-white line-clamp-1 max-w-xs">{ev.title}</p>
-                      {!ev.imageUrl && <span className="text-xs text-amber-500">⚠ No image</span>}
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {!ev.imageUrl && <span className="text-xs text-amber-500">⚠ No image</span>}
+                        {ev.meetLink && (
+                          <span className="text-xs text-primary">🎥 Virtual</span>
+                        )}
+                      </div>
                     </td>
+
+                    {/* Location */}
                     <td className="px-4 py-3 hidden md:table-cell text-gray-500 dark:text-gray-400 text-xs">
                       {ev.location ?? "—"}
                     </td>
+
+                    {/* Date */}
                     <td className="px-4 py-3 hidden lg:table-cell text-gray-400 text-xs">
                       {formatPostDate(ev.dateCreated)}
                     </td>
+
+                    {/* Status toggle */}
                     <td className="px-4 py-3">
                       <button
                         onClick={() => handleToggle(ev)}
                         disabled={toggling === ev.id}
+                        title="Click to toggle status"
                         className={`text-xs font-medium px-2.5 py-1 rounded-full transition-all whitespace-nowrap ${
                           ev.status === "PUBLISHED"
                             ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200"
@@ -141,10 +203,15 @@ export default function AdminEventsPage() {
                         {toggling === ev.id ? "…" : ev.status}
                       </button>
                     </td>
+
+                    {/* Actions */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2 justify-end">
-                        <Link href={`/admin/events/${ev.id}`}
-                          className="text-gray-400 hover:text-primary transition-colors" title="Edit">
+                        <Link
+                          href={`/admin/events/${ev.id}`}
+                          className="text-gray-400 hover:text-primary transition-colors"
+                          title="Edit event"
+                        >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>

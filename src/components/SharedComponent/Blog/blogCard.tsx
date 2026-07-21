@@ -23,7 +23,7 @@ const stripHtmlTags = (html: string): string => {
 
 const BlogCard = ({ blog }: { blog: Post }) => {
   const coverImage = blog.imageUrl ?? FALLBACK_IMAGE;
-  const date = blog.dateCreated ?? blog.createdAt;
+  const date = blog.dateCreated;
   
   // Strip HTML tags and get plain text excerpt
   const excerpt = blog.content 

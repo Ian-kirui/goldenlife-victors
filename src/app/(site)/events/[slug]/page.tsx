@@ -62,11 +62,9 @@ export default async function EventDetailPage({ params }: any) {
               <h1 className="text-midnight_text dark:text-white text-[40px] leading-tight font-bold">
                 {event.title}
               </h1>
-              {event.author && (
-                <p className="mt-4 text-gray-500 dark:text-gray-400 text-sm">
-                  Organised by <span className="font-medium text-midnight_text dark:text-white">{event.author.name}</span>
-                </p>
-              )}
+              <p className="mt-4 text-gray-500 dark:text-gray-400 text-sm">
+                Organised by <span className="font-medium text-midnight_text dark:text-white">GoldenLife Victors</span>
+              </p>
             </div>
 
             {/* Register / Join CTA */}
@@ -156,17 +154,15 @@ export default async function EventDetailPage({ params }: any) {
                     </div>
                   )}
 
-                  {event.author && (
-                    <div className="flex gap-3">
-                      <svg className="w-5 h-5 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <div>
-                        <p className="text-xs text-gray-400 mb-0.5">Organiser</p>
-                        <p className="text-midnight_text dark:text-white font-medium">{event.author.name}</p>
-                      </div>
+                  <div className="flex gap-3">
+                    <svg className="w-5 h-5 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <div>
+                      <p className="text-xs text-gray-400 mb-0.5">Organiser</p>
+                      <p className="text-midnight_text dark:text-white font-medium">GoldenLife Victors</p>
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 {event.meetLink && (
