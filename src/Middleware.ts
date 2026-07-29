@@ -23,7 +23,7 @@ export async function middleware(req: NextRequest) {
   const roles: string[] = (token.roles as string[]) ?? [];
   const isAdmin = roles.some((r) => ADMIN_ROLES.includes(r));
 
-  console.log("[Middleware] roles:", roles, "| isAdmin:", isAdmin);
+  
 
   if (!isAdmin) {
     const homeUrl = req.nextUrl.clone();

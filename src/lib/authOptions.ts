@@ -59,7 +59,7 @@ export const authOptions: NextAuthOptions = {
         token.accessToken = (user as any).accessToken;
         token.id = user.id;
         token.roles = (user as any).roles ?? [];
-        console.log("[JWT] roles stored:", token.roles); // ← add this
+        
       }
       return token;
     },
