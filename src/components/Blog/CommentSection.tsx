@@ -13,7 +13,6 @@ interface CommentSectionProps {
 
 export default function CommentSection({ postId, initialComments = [] }: CommentSectionProps) {
   const [authorName, setAuthorName]   = useState("");
-  const [authorEmail, setAuthorEmail] = useState("");
   const [content, setContent]         = useState("");
   const [submitting, setSubmitting]   = useState(false);
   const [submitted, setSubmitted]     = useState(false);
@@ -23,17 +22,15 @@ export default function CommentSection({ postId, initialComments = [] }: Comment
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() || !authorName.trim() || !authorEmail.trim()) return;
+    if (!content.trim() || !authorName.trim()) return;
     setSubmitting(true);
     try {
       await createComment(postId, {
         content: content.trim(),
         authorName: authorName.trim(),
-        authorEmail: authorEmail.trim(),
       });
       setContent("");
       setAuthorName("");
-      setAuthorEmail("");
       setSubmitted(true);
       toast.success("Comment submitted — it will appear after review.");
     } catch (e: any) {
@@ -118,20 +115,6 @@ export default function CommentSection({ postId, initialComments = [] }: Comment
                 className="w-full px-4 py-2.5 rounded-lg border border-border dark:border-dark_border bg-white dark:bg-dark text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-primary text-sm transition-colors"
               />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                Email <span className="text-red-500">*</span>
-                <span className="ml-1 font-normal text-gray-400">(not published)</span>
-              </label>
-              <input
-                type="email"
-                required
-                value={authorEmail}
-                onChange={(e) => setAuthorEmail(e.target.value)}
-                placeholder="your@email.com"
-                className="w-full px-4 py-2.5 rounded-lg border border-border dark:border-dark_border bg-white dark:bg-dark text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-primary text-sm transition-colors"
-              />
-            </div>
           </div>
 
           {/* Comment textarea */}
@@ -155,7 +138,7 @@ export default function CommentSection({ postId, initialComments = [] }: Comment
             </p>
             <button
               type="submit"
-              disabled={submitting || !content.trim() || !authorName.trim() || !authorEmail.trim()}
+              disabled={submitting || !content.trim() || !authorName.trim()}
               className="flex items-center gap-2 bg-primary hover:bg-darkprimary disabled:opacity-50 text-white text-sm font-medium px-6 py-2.5 rounded-lg transition-colors"
             >
               {submitting ? (

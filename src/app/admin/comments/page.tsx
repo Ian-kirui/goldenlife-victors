@@ -159,9 +159,6 @@ export default function AdminCommentsPage() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 hidden lg:table-cell text-gray-400 text-xs">
-                      {comment.authorEmail ?? "—"}
-                    </td>
                     <td className="px-4 py-4">
                       <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor(comment.status)}`}>
                         {comment.status}

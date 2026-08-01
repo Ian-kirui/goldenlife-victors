@@ -18,7 +18,6 @@ export interface Comment {
   postId?: string;
   content: string;
   authorName: string;   // flat field, not nested author object
-  authorEmail?: string;
   status: "PENDING" | "APPROVED" | "REJECTED" | string;
   dateCreated?: string;
 }
@@ -51,6 +50,7 @@ export interface Event {
   authorId?: string;
   meetLink?: string | null;
   location?: string | null;
+  registrationLink?: string | null;
   dateCreated?: string;
 }
 

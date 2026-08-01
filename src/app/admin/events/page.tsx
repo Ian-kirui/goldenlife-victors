@@ -13,11 +13,11 @@ type Tab = "ALL" | "PUBLISHED" | "DRAFT";
 
 export default function AdminEventsPage() {
   const { data: session, status } = useSession();
-  const [events, setEvents]     = useState<Event[]>([]);
-  const [loading, setLoading]   = useState(true);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
-  const [search, setSearch]     = useState("");
-  const [tab, setTab]           = useState<Tab>("ALL");
+  const [search, setSearch] = useState("");
+  const [tab, setTab] = useState<Tab>("ALL");
 
   const token = (session as any)?.accessToken as string;
 
@@ -50,8 +50,11 @@ export default function AdminEventsPage() {
         status: newStatus as "DRAFT" | "PUBLISHED",
         location: ev.location ?? undefined,
         meetLink: ev.meetLink ?? undefined,
+        registrationLink: ev.registrationLink ?? undefined,
       });
-      toast.success(newStatus === "PUBLISHED" ? "Event published" : "Moved to draft");
+      toast.success(
+        newStatus === "PUBLISHED" ? "Event published" : "Moved to draft"
+      );
       fetchEvents();
     } catch (e: any) {
       toast.error(e.message ?? "Failed to update");
@@ -80,17 +83,30 @@ export default function AdminEventsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Events</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Events
+          </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {counts.ALL} total · {counts.PUBLISHED} published · {counts.DRAFT} drafts
+            {counts.ALL} total · {counts.PUBLISHED} published · {counts.DRAFT}{" "}
+            drafts
           </p>
         </div>
         <Link
           href="/admin/events/new"
           className="flex items-center gap-2 bg-primary hover:bg-darkprimary text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           New Event
         </Link>
@@ -109,7 +125,10 @@ export default function AdminEventsPage() {
           {tabs.map((t) => (
             <button
               key={t}
-              onClick={() => { setSearch(""); setTab(t); }}
+              onClick={() => {
+                setSearch("");
+                setTab(t);
+              }}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
                 tab === t
                   ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
@@ -132,8 +151,10 @@ export default function AdminEventsPage() {
           <div className="py-20 text-center text-gray-400 text-sm">
             {search
               ? "No events match your search."
-              : tab === "DRAFT" ? "No draft events yet."
-              : tab === "PUBLISHED" ? "No published events yet."
+              : tab === "DRAFT"
+              ? "No draft events yet."
+              : tab === "PUBLISHED"
+              ? "No published events yet."
               : "No events yet. Create your first event!"}
           </div>
         ) : (
@@ -141,26 +162,57 @@ export default function AdminEventsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-800">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-12">Image</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Title</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Location</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Date</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-12">
+                    Image
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Title
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">
+                    Location
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">
+                    Date
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                 {filtered.map((ev) => (
-                  <tr key={ev.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
+                  <tr
+                    key={ev.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
+                  >
                     {/* Thumbnail */}
                     <td className="px-4 py-3">
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
                         {ev.imageUrl ? (
-                          <Image src={ev.imageUrl} alt={ev.title} fill className="object-cover" sizes="48px" />
+                          <Image
+                            src={ev.imageUrl}
+                            alt={ev.title}
+                            fill
+                            className="object-cover"
+                            sizes="48px"
+                          />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <svg className="w-5 h-5 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <svg
+                              className="w-5 h-5 text-gray-300 dark:text-gray-600"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
                             </svg>
                           </div>
                         )}
@@ -169,11 +221,24 @@ export default function AdminEventsPage() {
 
                     {/* Title */}
                     <td className="px-4 py-3">
-                      <p className="font-medium text-gray-900 dark:text-white line-clamp-1 max-w-xs">{ev.title}</p>
+                      <p className="font-medium text-gray-900 dark:text-white line-clamp-1 max-w-xs">
+                        {ev.title}
+                      </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        {!ev.imageUrl && <span className="text-xs text-amber-500">⚠ No image</span>}
+                        {!ev.imageUrl && (
+                          <span className="text-xs text-amber-500">
+                            ⚠ No image
+                          </span>
+                        )}
                         {ev.meetLink && (
-                          <span className="text-xs text-primary">🎥 Virtual</span>
+                          <span className="text-xs text-primary">
+                            🎥 Virtual
+                          </span>
+                        )}
+                        {ev.registrationLink && (
+                          <span className="text-xs text-secondary">
+                            📝 Registration
+                          </span>
                         )}
                       </div>
                     </td>
@@ -198,7 +263,11 @@ export default function AdminEventsPage() {
                           ev.status === "PUBLISHED"
                             ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200"
                             : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-200"
-                        } ${toggling === ev.id ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                        } ${
+                          toggling === ev.id
+                            ? "opacity-50 cursor-not-allowed"
+                            : "cursor-pointer"
+                        }`}
                       >
                         {toggling === ev.id ? "…" : ev.status}
                       </button>
@@ -212,8 +281,18 @@ export default function AdminEventsPage() {
                           className="text-gray-400 hover:text-primary transition-colors"
                           title="Edit event"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
                           </svg>
                         </Link>
                       </div>

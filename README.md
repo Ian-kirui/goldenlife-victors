@@ -362,7 +362,7 @@ Admin rejects  → status: REJECTED → hidden from public
 #### Comments
 | Method | Endpoint | Auth | Notes |
 |---|---|---|---|
-| POST | `/comments/public/{postId}` | None | `{ content, authorName, authorEmail }` |
+| POST | `/comments/public/{postId}` | None | `{ content, authorName }` |
 | GET | `/comments/admin` | Bearer | `?status=PENDING\|APPROVED\|REJECTED` |
 | PUT | `/comments/{id}/approve` | Bearer | No body |
 | PUT | `/comments/{id}/reject` | Bearer | No body |

@@ -339,6 +339,7 @@ export interface CreateEventPayload {
   status: "DRAFT" | "PUBLISHED";
   meetLink?: string;
   location?: string;
+  registrationLink?: string;
 }
 
 export async function createEvent(token: string, payload: CreateEventPayload): Promise<Event> {
@@ -379,11 +380,11 @@ export async function uploadEventImage(token: string, eventId: string, imageFile
 
 // ─── Comments: Public (no auth needed) ───────────────────────────────────────
 // POST /comments/public/{postId}
-// Body: { content, authorName, authorEmail }
+// Body: { content, authorName }
 
 export async function createComment(
   postId: string,
-  payload: { content: string; authorName: string; authorEmail: string }
+  payload: { content: string; authorName: string;  }
 ): Promise<Comment> {
   const res = await fetch(`${BASE}/comments/public/${postId}`, {
     method: "POST",
