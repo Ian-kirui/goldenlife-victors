@@ -17,7 +17,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 type Tab = "MY_POSTS" | "PUBLISHED" | "DRAFT";
 
-const PLACEHOLDER = "/images/blog/placeholder.jpg";
+const PLACEHOLDER = "https://www.goldenlifekenya.org/images/20221121_122506.jpg";
 
 const TAB_LABELS: Record<Tab, string> = {
   MY_POSTS: "My Posts",

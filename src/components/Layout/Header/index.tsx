@@ -331,7 +331,7 @@ const Header: React.FC = () => {
               onClick={() => donationInfo?.setIsDonationOpen(true)}
               className="text-error text-sm font-semibold border border-error py-4 px-7 rounded-md ml-8 hover:bg-error hover:text-white"
             >
-              Donate now
+              Support Us
             </button>
           </div>
         </div>

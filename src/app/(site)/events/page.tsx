@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     "Upcoming and past events by GoldenLife Victors — workshops, therapy programmes, community outreaches and more.",
 };
 
-const PLACEHOLDER = "/images/event/event-1.jpg";
+const PLACEHOLDER = "https://www.goldenlifekenya.org/images/20221121_122506.jpg";
 
 export default async function EventsPage() {
   const events = await getPublicEvents();

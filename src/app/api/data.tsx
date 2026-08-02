@@ -118,75 +118,27 @@ export const CauseData: {
 }[] = [
   {
     image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
-    title: "Give medical related help for african children",
-    slug: "cause-1",
-    text: "You can relay on our amazing features list and also our customer services will be great experience.",
-    raised: "$65,360",
-    goal: "$124,500",
+    title: "People Reached",
+    slug: "People-Reached",
+    text: "How many affected people have we been able to get to:",
+    raised: "3000 People",
+    goal: "4000 People",
   },
   {
-    image: "/images/causes/cause-2.jpg",
-    title: "Give small bunch of colors to little kids, joy of colors",
-    slug: "cause-2",
-    text: "You can relay on our amazing features list and also our customer services will be great experience.",
-    raised: "$65,360",
-    goal: "$124,500",
+    image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
+    title: "People Treated",
+    slug: "People-Treated",
+    text: "How many affected people have we been able to create a new lasting change:",
+    raised: "2500 People",
+    goal: "5000 People",
   },
   {
-    image: "/images/causes/cause-3.jpg",
-    title: "Send poor children to school to become superhero",
-    slug: "cause-3",
-    text: "You can relay on our amazing features list and also our customer services will be great experience.",
-    raised: "$65,360",
-    goal: "$124,500",
-  },
-  {
-    image: "/images/causes/cause-4.jpg",
-    title: "Uniting Hearts and Minds through Healthcare Outreach",
-    slug: "cause-4",
-    text: "You can relay on our amazing features list and also our customer services will be great experience.",
-    raised: "$65,360",
-    goal: "$124,500",
-  },
-  {
-    image: "/images/causes/cause-5.jpg",
-    title: "Auctioning Masterpieces to Support Arts Education in Schools",
-    slug: "cause-5",
-    text: "You can relay on our amazing features list and also our customer services will be great experience.",
-    raised: "$65,360",
-    goal: "$124,500",
-  },
-  {
-    image: "/images/causes/cause-6.jpg",
-    title: "Medical Mission Providing Care in Underserved Communities",
-    slug: "cause-6",
-    text: "You can relay on our amazing features list and also our customer services will be great experience.",
-    raised: "$65,360",
-    goal: "$124,500",
-  },
-  {
-    image: "/images/causes/cause-7.jpg",
-    title: "Empowering Women and Girls Through Education Initiatives",
-    slug: "cause-7",
-    text: "You can relay on our amazing features list and also our customer services will be great experience.",
-    raised: "$65,360",
-    goal: "$124,500",
-  },
-  {
-    image: "/images/causes/cause-8.jpg",
-    title: "Harnessing Renewable Energy for Environmental Conservation",
-    slug: "cause-8",
-    text: "You can relay on our amazing features list and also our customer services will be great experience.",
-    raised: "$65,360",
-    goal: "$124,500",
-  },
-  {
-    image: "/images/causes/cause-9.jpg",
-    title: "A Fundraising Gala for Education Equality and Access",
-    slug: "cause-9",
-    text: "You can relay on our amazing features list and also our customer services will be great experience.",
-    raised: "$65,360",
-    goal: "$124,500",
+    image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
+    title: "Places Reached",
+    slug: "Places-Reached",
+    text: "How many places have we been able to access and change lives:",
+    raised: "50",
+    goal: "65",
   },
 ];
 
@@ -330,18 +282,12 @@ export const Reviews: {
 }[] = [
   {
     clientImg: "/images/testimonial/client-1.jpg",
-    clientName: "Michelle Anderson",
+    clientName: "Jamilla Angela",
     review:
       "You can relay on our amazing features list and also our customer services will be great experience. You can relay on our amazing features.",
-    post: "CEO, Theme Designer",
+    post: "CEO",
   },
-  {
-    clientImg: "/images/testimonial/client-2.jpg",
-    clientName: "Michelle Anderson",
-    review:
-      "You can relay on our amazing features list and also our customer services will be great experience. You can relay on our amazing features.",
-    post: "Managing Director, Theme Designer",
-  },
+  
 ];
 
 

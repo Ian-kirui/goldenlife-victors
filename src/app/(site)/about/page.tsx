@@ -4,14 +4,14 @@ import Volunteer from "@/components/SharedComponent/Volunteer";
 import Help from "@/components/Home/Help";
 import Testimonial from "@/components/Home/Testimonial";
 import Image from "next/image";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About Us | GoldenLife Victors",
   description:
-    "Learn about GoldenLife Victors — our story, mission, and vision for a world where mental health is valued and accessible to all.",
+    "Learn about GoldenLife Victors — our story, mission, vision, and our approach to alcohol and substance use disorder rehabilitation in Kenya.",
 };
 
-// ─── Story / Mission / Vision data ───────────────────────────────────────────
 const pillars = [
   {
     icon: (
@@ -22,7 +22,7 @@ const pillars = [
     ),
     label: "Our Story",
     heading: "Where it all began",
-    body: "GoldenLife Victors is an organization that began with the aim of providing integrated, world-class quality and exceptional services on mental health and well-being of the community around us — anywhere — through our all-time available professionals. The Travel Psychologists.",
+    body: "GoldenLife Victors began with the aim of providing integrated, world-class quality and exceptional services on mental health and well-being — anywhere — through our all-time available professionals. The Travel Psychologists.",
   },
   {
     icon: (
@@ -33,7 +33,7 @@ const pillars = [
     ),
     label: "Our Mission",
     heading: "Care without borders",
-    body: "Our mission is to create a world where mental health is viewed with the same importance as physical health — where individuals receive accessible, compassionate and effective care. We strive to build a society that values and prioritizes mental wellness, where stigma is eliminated and individuals are supported in their journey towards optimal mental health and well-being.",
+    body: "Our mission is to create a world where mental health is viewed with the same importance as physical health — where individuals receive accessible, compassionate and effective care and where stigma is eliminated.",
   },
   {
     icon: (
@@ -46,18 +46,17 @@ const pillars = [
     ),
     label: "Our Vision",
     heading: "World-class excellence",
-    body: "Our vision is to become a world-class center of excellence in mental health and well-being — a beacon of hope and healing that reaches communities across Africa and beyond.",
+    body: "Our vision is to become a world-class centre of excellence in mental health and well-being — a beacon of hope and healing that reaches communities across Africa and beyond.",
   },
 ];
 
-// ─── Core values ─────────────────────────────────────────────────────────────
 const values = [
-  { title: "Compassion",   desc: "We approach every individual with empathy, dignity and genuine care." },
-  { title: "Excellence",   desc: "We uphold the highest professional standards in everything we do." },
-  { title: "Accessibility",desc: "Mental health support should be available to everyone, everywhere." },
-  { title: "Community",    desc: "Healing happens in connection — we build supportive networks that last." },
-  { title: "Integrity",    desc: "We operate with transparency, honesty and accountability at all times." },
-  { title: "Innovation",   desc: "We embrace new ideas, research and methods to continuously improve care." },
+  { title: "Compassion",    desc: "We approach every individual with empathy, dignity and genuine care." },
+  { title: "Excellence",    desc: "We uphold the highest professional standards in everything we do." },
+  { title: "Accessibility", desc: "Mental health support should be available to everyone, everywhere." },
+  { title: "Community",     desc: "Healing happens in connection — we build supportive networks that last." },
+  { title: "Integrity",     desc: "We operate with transparency, honesty and accountability at all times." },
+  { title: "Innovation",    desc: "We embrace new ideas, research and methods to continuously improve care." },
 ];
 
 export default function AboutPage() {
@@ -72,21 +71,22 @@ export default function AboutPage() {
             <div data-aos="fade-right" data-aos-duration="1000">
               <p className="text-primary text-base font-medium mb-3">Who We Are</p>
               <h2 className="text-4xl font-bold text-midnight_text dark:text-white mb-6 leading-tight">
-                Transforming lives through mental wellness
+                Transforming lives through rehabilitation & partnership
               </h2>
+              <p className="text-muted dark:text-white/70 text-base leading-relaxed mb-4">
+                GoldenLife Victors is a world-class organisation specialising in alcohol and substance use disorder
+                rehabilitation, community outreach, and global mental health practices. We reach individuals wherever
+                they are — through our inpatient hospital in Naivasha and through community-based programmes across Kenya.
+              </p>
               <p className="text-muted dark:text-white/70 text-base leading-relaxed mb-6">
-                GoldenLife Victors is a world-class organization dedicated to promoting mental health, wellness,
-                and recovery through compassionate care, community outreach, and global collaboration.
+                Our work is powered not by donations, but by <strong className="text-primary">partnerships</strong> —
+                professionals, volunteers, and organisations who share our vision and work alongside us to restore lives.
               </p>
-              <p className="text-muted dark:text-white/70 text-base leading-relaxed">
-                From school-based therapy and youth empowerment to rehabilitation and corporate wellness, our
-                programmes touch every layer of society — because mental health matters at every stage of life.
-              </p>
-              <div className="grid grid-cols-3 gap-6 mt-10">
+              <div className="grid grid-cols-3 gap-6 mt-8">
                 {[
-                  { number: "500+",  label: "Clients Served" },
-                  { number: "10+",   label: "Programmes" },
-                  { number: "5+",    label: "Years of Impact" },
+                  { number: "500+", label: "Clients Served" },
+                  { number: "10+",  label: "Programmes" },
+                  { number: "5+",   label: "Years of Impact" },
                 ].map((s) => (
                   <div key={s.label} className="text-center">
                     <p className="text-3xl font-bold text-primary">{s.number}</p>
@@ -105,7 +105,6 @@ export default function AboutPage() {
                   className="w-full h-[420px] object-cover"
                 />
               </div>
-              {/* Accent badge */}
               <div className="absolute -bottom-6 -left-6 bg-primary text-white rounded-2xl px-6 py-4 shadow-xl">
                 <p className="text-3xl font-bold">100%</p>
                 <p className="text-sm opacity-90">Commitment to Care</p>
@@ -115,36 +114,88 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Story / Mission / Vision ── */}
+      {/* ── Rehabilitation Approach ── */}
       <section className="py-20 bg-SnowySky dark:bg-darklight px-4">
         <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md)">
           <div className="text-center mb-14">
-            <p className="text-primary text-base font-medium mb-3">Our Foundation</p>
+            <p className="text-primary text-base font-medium mb-3">Our Core Focus</p>
             <h2 className="text-4xl font-bold text-midnight_text dark:text-white">
-              Story, Mission & Vision
+              Rehabilitation — Two Pathways to Recovery
             </h2>
+            <p className="text-muted dark:text-white/70 text-base mt-4 max-w-2xl mx-auto">
+              We specialise in alcohol and substance use disorder rehabilitation through two complementary approaches,
+              ensuring no one is left behind regardless of the severity of their situation.
+            </p>
+          </div>
+          <div className="grid lg:grid-cols-2 grid-cols-1 gap-8">
+            {/* Inpatient */}
+            <div className="bg-white dark:bg-dark rounded-2xl p-8 shadow-sm border border-border dark:border-dark_border hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="0" data-aos-duration="1000">
+              <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-5">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <span className="text-xs font-semibold uppercase tracking-widest text-primary mb-2 block">Pathway 1</span>
+              <h3 className="text-xl font-bold text-midnight_text dark:text-white mb-3">Inpatient Hospital</h3>
+              <p className="text-muted dark:text-white/70 text-base leading-relaxed mb-4">
+                Our inpatient facility in <strong>Naivasha, Kenya</strong> provides structured, full-time residential
+                rehabilitation for individuals requiring intensive care and a safe environment to recover from alcohol
+                and substance use disorder.
+              </p>
+              <p className="text-muted dark:text-white/70 text-sm leading-relaxed mb-5 italic">
+                Note: When using maps to find us, please call ahead to confirm the best route — GPS directions can
+                sometimes suggest longer routes to our location.
+              </p>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:underline"
+              >
+                Get directions & contact us →
+              </Link>
+            </div>
+
+            {/* Community */}
+            <div className="bg-white dark:bg-dark rounded-2xl p-8 shadow-sm border border-border dark:border-dark_border hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="150" data-aos-duration="1000">
+              <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-5">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <span className="text-xs font-semibold uppercase tracking-widest text-primary mb-2 block">Pathway 2</span>
+              <h3 className="text-xl font-bold text-midnight_text dark:text-white mb-3">Community Rehabilitation</h3>
+              <p className="text-muted dark:text-white/70 text-base leading-relaxed mb-4">
+                Our teams go directly into communities to identify and support individuals and groups dealing with
+                alcohol and substance use disorder. Those who can be helped through community-level care receive
+                support on the ground. Those who need more are referred to our inpatient facility.
+              </p>
+              <Link
+                href="/programmes"
+                className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:underline"
+              >
+                View our community programmes →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Story / Mission / Vision ── */}
+      <section className="py-20 dark:bg-dark px-4">
+        <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md)">
+          <div className="text-center mb-14">
+            <p className="text-primary text-base font-medium mb-3">Our Foundation</p>
+            <h2 className="text-4xl font-bold text-midnight_text dark:text-white">Story, Mission & Vision</h2>
           </div>
           <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-8">
             {pillars.map((p, i) => (
-              <div
-                key={p.label}
+              <div key={p.label}
                 className="bg-white dark:bg-dark rounded-2xl p-8 shadow-sm border border-border dark:border-dark_border hover:shadow-md transition-shadow"
-                data-aos="fade-up"
-                data-aos-delay={`${i * 150}`}
-                data-aos-duration="1000"
+                data-aos="fade-up" data-aos-delay={`${i * 150}`} data-aos-duration="1000"
               >
-                <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-5">
-                  {p.icon}
-                </div>
-                <span className="text-xs font-semibold uppercase tracking-widest text-primary mb-2 block">
-                  {p.label}
-                </span>
-                <h3 className="text-xl font-bold text-midnight_text dark:text-white mb-3">
-                  {p.heading}
-                </h3>
-                <p className="text-muted dark:text-white/70 text-base leading-relaxed">
-                  {p.body}
-                </p>
+                <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-5">{p.icon}</div>
+                <span className="text-xs font-semibold uppercase tracking-widest text-primary mb-2 block">{p.label}</span>
+                <h3 className="text-xl font-bold text-midnight_text dark:text-white mb-3">{p.heading}</h3>
+                <p className="text-muted dark:text-white/70 text-base leading-relaxed">{p.body}</p>
               </div>
             ))}
           </div>
@@ -152,7 +203,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── Core values ── */}
-      <section className="py-20 dark:bg-dark px-4">
+      <section className="py-20 bg-SnowySky dark:bg-darklight px-4">
         <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md)">
           <div className="text-center mb-14">
             <p className="text-primary text-base font-medium mb-3">What Drives Us</p>
@@ -160,12 +211,9 @@ export default function AboutPage() {
           </div>
           <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
             {values.map((v, i) => (
-              <div
-                key={v.title}
+              <div key={v.title}
                 className="flex gap-4 p-6 rounded-xl border border-border dark:border-dark_border hover:border-primary dark:hover:border-primary transition-colors group"
-                data-aos="fade-up"
-                data-aos-delay={`${i * 100}`}
-                data-aos-duration="1000"
+                data-aos="fade-up" data-aos-delay={`${i * 100}`} data-aos-duration="1000"
               >
                 <div className="w-2 rounded-full bg-primary shrink-0 group-hover:bg-secondary transition-colors" />
                 <div>
@@ -178,7 +226,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Reused components */}
       <Help />
       <Testimonial />
       <Volunteer />

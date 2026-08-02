@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Post } from "@/types/api.types";
 import { formatPostDate } from "@/utils/formatDate";
 
-const PLACEHOLDER = "/images/blog/placeholder.jpg";
+const PLACEHOLDER = "https://www.goldenlifekenya.org/images/20221121_122506.jpg";
 
 const BlogCard = ({ blog }: { blog: Post }) => {
   const coverImage = blog.imageUrl ?? PLACEHOLDER;

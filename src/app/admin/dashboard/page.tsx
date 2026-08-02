@@ -8,7 +8,7 @@ import { formatPostDate } from "@/utils/formatDate";
 
 export const dynamic = "force-dynamic";
 
-const PLACEHOLDER = "/images/blog/placeholder.jpg";
+const PLACEHOLDER = "https://www.goldenlifekenya.org/images/20221121_122506.jpg";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);

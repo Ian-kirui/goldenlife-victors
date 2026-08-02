@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   };
 }
 
-const PLACEHOLDER = "/images/event/event-1.jpg";
+const PLACEHOLDER = "https://www.goldenlifekenya.org/images/20221121_122506.jpg";
 
 export default async function EventDetailPage({ params }: any) {
   const { slug } = await params;
