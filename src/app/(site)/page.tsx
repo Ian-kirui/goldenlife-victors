@@ -9,6 +9,7 @@ import Newsletter from '@/components/Home/NewsLetter';
 import Testimonial from '@/components/Home/Testimonial';
 import Volunteer from '@/components/SharedComponent/Volunteer';
 import UnauthorizedToast from '@/components/Common/UnauthorizedToast';
+import IMARABanner from '@/components/Home/IMARABanner/IMARABanner';
 
 export const metadata: Metadata = {
   title: "GoldenLife Victors | Mental Health & Wellness Organization",
@@ -66,6 +67,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
+      <IMARABanner />
       {/* Suspense required because UnauthorizedToast uses useSearchParams() */}
       <Suspense fallback={null}>
         <UnauthorizedToast />

@@ -13,7 +13,7 @@ const Programme = () => {
   const { slug } = useParams();
 
   // Find the blog post by slug
-  const item = ProgrammeData.find((item) => item.slug === slug);
+  const item = ProgrammeData.find((p) => p.slug === slug);
   if (!item) {
     return <div>Loading...</div>;
   }
@@ -59,7 +59,7 @@ const Programme = () => {
                 </div>
               </div>
               <FormPart />
-              <TextPart />
+              <TextPart detail={item.detail} />
             </div>
             <div className="lg:col-span-3 col-span-12">
               <h4 className="text-lg font-medium mb-6">Search</h4>

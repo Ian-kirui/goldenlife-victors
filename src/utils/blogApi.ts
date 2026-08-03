@@ -76,18 +76,25 @@ function normaliseAll(posts: any[]): Post[] {
   return Array.isArray(posts) ? posts.map(normalise) : [];
 }
 
+/** Sort events latest first */
+function sortEvents(events: Event[]): Event[] {
+  return events.sort((a, b) => {
+    const da = a.dateCreated ? new Date(a.dateCreated).getTime() : 0;
+    const db = b.dateCreated ? new Date(b.dateCreated).getTime() : 0;
+    return db - da;
+  });
+}
+
 /** Events are wrapped: { status, message, data: EventResponse | EventResponse[] } */
 function unwrapEvent(raw: any): Event | null {
   if (!raw) return null;
-  // If it has a `data` property it's a MessageResponse wrapper
-  const ev = raw.data ?? raw;
-  return ev ?? null;
+  return raw.data ?? raw ?? null;
 }
 
 function unwrapEvents(raw: any): Event[] {
   if (!raw) return [];
   const list = raw.data ?? raw;
-  return Array.isArray(list) ? list : [];
+  return sortEvents(Array.isArray(list) ? list : []);
 }
 
 // ─── Auth: Forgot / Reset Password ───────────────────────────────────────────
@@ -126,7 +133,6 @@ export async function getAllPublicPosts(): Promise<Post[]> {
   }
 }
 
-/** Uses the dedicated /posts/public/{id} endpoint — returns comments[] too */
 export async function getPublicPostById(id: string): Promise<Post | null> {
   try {
     const raw = await freshFetch<any>(`/posts/public/${id}`);
@@ -282,7 +288,6 @@ export async function createTags(token: string, names: string[]): Promise<Tag[]>
 }
 
 // ─── Events: Public ───────────────────────────────────────────────────────────
-// Response shape: { status, message, data: EventResponse[] }
 
 export async function getPublicEvents(): Promise<Event[]> {
   try {
@@ -303,11 +308,9 @@ export async function getPublicEventById(id: string): Promise<Event | null> {
 }
 
 // ─── Events: Admin ────────────────────────────────────────────────────────────
-// Response shape: { status, message, data: EventResponse[] }
 
 export async function getAdminEvents(token: string): Promise<Event[]> {
   try {
-    // Use a direct fetch for GET to avoid Content-Type header issues on some servers
     const res = await fetch(`${BASE}/events/admin`, {
       method: "GET",
       cache: "no-store",
@@ -379,12 +382,10 @@ export async function uploadEventImage(token: string, eventId: string, imageFile
 }
 
 // ─── Comments: Public (no auth needed) ───────────────────────────────────────
-// POST /comments/public/{postId}
-// Body: { content, authorName }
 
 export async function createComment(
   postId: string,
-  payload: { content: string; authorName: string;  }
+  payload: { content: string; authorName: string }
 ): Promise<Comment> {
   const res = await fetch(`${BASE}/comments/public/${postId}`, {
     method: "POST",
@@ -397,7 +398,6 @@ export async function createComment(
     throw new Error(body?.message ?? `Failed to submit comment (${res.status})`);
   }
   const raw = await res.json();
-  // Response: { status, message, data: CommentDto }
   return raw.data ?? raw;
 }
 
@@ -419,12 +419,10 @@ export async function getAdminComments(
   }
 }
 
-/** PUT /comments/{commentId}/approve */
 export async function approveComment(token: string, commentId: string): Promise<Comment> {
   return authFetch<Comment>(`/comments/${commentId}/approve`, token, { method: "PUT" });
 }
 
-/** PUT /comments/{commentId}/reject */
 export async function rejectComment(token: string, commentId: string): Promise<Comment> {
   return authFetch<Comment>(`/comments/${commentId}/reject`, token, { method: "PUT" });
 }

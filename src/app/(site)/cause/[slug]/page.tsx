@@ -61,7 +61,7 @@ const Cause = () => {
                                 </div>
                             </div>
                             <FormPart />
-                            <TextPart />
+                           <TextPart detail={item.detail} />
                         </div>
                         <div className="lg:col-span-3 col-span-12">
                             <h4 className="text-lg font-medium mb-6">
