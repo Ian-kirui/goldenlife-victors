@@ -43,7 +43,7 @@ export const ProgrammeData: {
 }[] = [
   {
     image: "/images/all/3.jpg",
-    title: "IMARA Program – Indigenous Recovery & Awareness",
+    title: "IMARA (Indigenous Movement for Addiction Recovery and Awareness) Program",
     slug: "imara",
     text: "Our flagship initiative delivering culturally responsive, community-driven addiction recovery and mental health awareness to Kenya's pastoralist and indigenous communities.",
     raised: "3,000 People Reached",

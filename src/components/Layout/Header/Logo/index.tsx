@@ -1,10 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-const Logo: React.FC = () => {
+interface LogoProps {
+  className?: string;
+}
 
+const Logo: React.FC<LogoProps> = ({ className = '' }) => {
   return (
-    <Link href="/">
+    <Link href="/" className={`inline-block ${className}`}>
       <Image
         src="/images/logo/golden-life-logo.svg"
         alt="logo"

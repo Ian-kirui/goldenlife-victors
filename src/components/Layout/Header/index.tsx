@@ -185,7 +185,7 @@ const Header: React.FC = () => {
       <div className="sm:bg-linear-to-r bg-linear-to-l md:from-primary md:to-secondary lg:py-0 py-2 bg-white dark:bg-dark">
         <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) flex items-center justify-between px-4">
           <div className="lg:hidden block">
-            <Logo />
+            <Logo className="w-[280px] sm:w-[280px]" />
           </div>
 
           <nav className="hidden lg:flex grow items-center justify-start">
@@ -198,7 +198,7 @@ const Header: React.FC = () => {
             {/* Theme toggle */}
             <button
               aria-label="Toggle theme"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              onClick={() => setTheme(theme === "dark" ? "light" : "light")}
               className="flex h-8 w-8 items-center justify-center text-body-color duration-300 dark:text-white"
             >
               <svg
@@ -207,7 +207,10 @@ const Header: React.FC = () => {
                   !sticky && pathUrl === "/" && "text-white"
                 }`}
               >
-                <path d="M4.50663 3.2267L3.30663 2.03337L2.36663 2.97337L3.55996 4.1667L4.50663 3.2267ZM2.66663 7.00003H0.666626V8.33337H2.66663V7.00003ZM8.66663 0.366699H7.33329V2.33337H8.66663V0.366699V0.366699ZM13.6333 2.97337L12.6933 2.03337L11.5 3.2267L12.44 4.1667L13.6333 2.97337ZM11.4933 12.1067L12.6866 13.3067L13.6266 12.3667L12.4266 11.1734L11.4933 12.1067ZM13.3333 7.00003V8.33337H15.3333V7.00003H13.3333ZM7.99996 3.6667C5.79329 3.6667 3.99996 5.46003 3.99996 7.6667C3.99996 9.87337 5.79329 11.6667 7.99996 11.6667C10.2066 11.6667 12 9.87337 12 7.6667C12 5.46003 10.2066 3.6667 7.99996 3.6667ZM7.33329 14.9667H8.66663V13H7.33329V14.9667ZM2.36663 12.36L3.30663 13.3L4.49996 12.1L3.55996 11.16L2.36663 12.36Z" fill="#FFFFFF" />
+                <path
+                  d="M4.50663 3.2267L3.30663 2.03337L2.36663 2.97337L3.55996 4.1667L4.50663 3.2267ZM2.66663 7.00003H0.666626V8.33337H2.66663V7.00003ZM8.66663 0.366699H7.33329V2.33337H8.66663V0.366699V0.366699ZM13.6333 2.97337L12.6933 2.03337L11.5 3.2267L12.44 4.1667L13.6333 2.97337ZM11.4933 12.1067L12.6866 13.3067L13.6266 12.3667L12.4266 11.1734L11.4933 12.1067ZM13.3333 7.00003V8.33337H15.3333V7.00003H13.3333ZM7.99996 3.6667C5.79329 3.6667 3.99996 5.46003 3.99996 7.6667C3.99996 9.87337 5.79329 11.6667 7.99996 11.6667C10.2066 11.6667 12 9.87337 12 7.6667C12 5.46003 10.2066 3.6667 7.99996 3.6667ZM7.33329 14.9667H8.66663V13H7.33329V14.9667ZM2.36663 12.36L3.30663 13.3L4.49996 12.1L3.55996 11.16L2.36663 12.36Z"
+                  fill="#FFFFFF"
+                />
               </svg>
               <svg
                 viewBox="0 0 23 23"
@@ -286,7 +289,7 @@ const Header: React.FC = () => {
       <div className="dark:bg-dark">
         <div className="px-4 container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) sm:flex lg:justify-between justify-center py-5 hidden">
           <div className="lg:block hidden">
-            <Logo />
+            <Logo className="w-[300px] xl:w-[305px]" />
           </div>
           <div className="flex items-center">
             <div className="flex gap-3 py-2 pr-6 border-r dark:border-dark_border">
@@ -349,7 +352,10 @@ const Header: React.FC = () => {
               className="hover:bg-gray-200 dark:hover:bg-gray-700 p-1 rounded-full absolute -top-5 -right-3 mr-8 mt-8"
               aria-label="Close Sign In Modal"
             >
-              <Icon icon="ic:round-close" className="text-2xl dark:text-white" />
+              <Icon
+                icon="ic:round-close"
+                className="text-2xl dark:text-white"
+              />
             </button>
             <Signin signInOpen={(value: boolean) => setIsSignInOpen(value)} />
           </div>
@@ -368,7 +374,10 @@ const Header: React.FC = () => {
               className="hover:bg-gray-200 dark:hover:bg-gray-700 p-1 rounded-full absolute -top-5 -right-3 mr-8 mt-8"
               aria-label="Close Sign Up Modal"
             >
-              <Icon icon="ic:round-close" className="text-2xl dark:text-white" />
+              <Icon
+                icon="ic:round-close"
+                className="text-2xl dark:text-white"
+              />
             </button>
             <SignUp signUpOpen={(value: boolean) => setIsSignUpOpen(value)} />
           </div>
@@ -384,7 +393,10 @@ const Header: React.FC = () => {
               className="hover:bg-gray-200 dark:hover:bg-gray-700 p-1 rounded-full absolute -top-5 -right-3 mr-8 mt-8"
               aria-label="Close Donation Modal"
             >
-              <Icon icon="ic:round-close" className="text-2xl dark:text-white" />
+              <Icon
+                icon="ic:round-close"
+                className="text-2xl dark:text-white"
+              />
             </button>
             <Donation />
           </div>
@@ -392,13 +404,25 @@ const Header: React.FC = () => {
       )}
 
       {/* Toast alerts */}
-      <div className={`fixed top-6 end-1/2 translate-x-1/2 z-50 ${authDialog?.isSuccessDialogOpen ? "block" : "hidden"}`}>
+      <div
+        className={`fixed top-6 end-1/2 translate-x-1/2 z-50 ${
+          authDialog?.isSuccessDialogOpen ? "block" : "hidden"
+        }`}
+      >
         <SuccessfullLogin />
       </div>
-      <div className={`fixed top-6 end-1/2 translate-x-1/2 z-50 ${authDialog?.isFailedDialogOpen ? "block" : "hidden"}`}>
+      <div
+        className={`fixed top-6 end-1/2 translate-x-1/2 z-50 ${
+          authDialog?.isFailedDialogOpen ? "block" : "hidden"
+        }`}
+      >
         <FailedLogin />
       </div>
-      <div className={`fixed top-6 end-1/2 translate-x-1/2 z-50 ${authDialog?.isUserRegistered ? "block" : "hidden"}`}>
+      <div
+        className={`fixed top-6 end-1/2 translate-x-1/2 z-50 ${
+          authDialog?.isUserRegistered ? "block" : "hidden"
+        }`}
+      >
         <UserRegistered />
       </div>
     </header>
