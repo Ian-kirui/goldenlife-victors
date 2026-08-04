@@ -16,7 +16,7 @@ const page = () => {
         title="Contact Us"
       />
       <ContactInfo />
-      <ContactForm />
+      {/* <ContactForm /> */}
       <Location />
       <Volunteer />
     </>

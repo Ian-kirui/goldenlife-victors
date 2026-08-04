@@ -23,7 +23,7 @@ const ContactInfo = () => {
                 </div>
                 <div>
                   <Link
-                    href="#"
+                    href="mailto:goldenlifeinternational.kenya@gmail.com"
                     className="text-primary text-base font-medium flex items-center gap-3 group hover:text-midnight_text dark:hover:text-white"
                   >
                     Leave a message
@@ -48,11 +48,13 @@ const ContactInfo = () => {
               <div className="flex md:flex-col sm:flex-row flex-col md:items-start sm:items-center items-start h-full justify-between">
                 <div>
                   <span className="text-midnight_text dark:text-white text-xl font-bold">
-                    Careers
+                    Partner (Professional)
                   </span>
                   <p className="text-DeepOcean font-normal max-w-80 pt-3 pb-7 dark:text-white/50 text-base">
-                    Sit ac ipsum leo lorem magna nunc mattis maecenas non
-                    vestibulum
+                    Apply your professional expertise —
+                    clinical, counselling,..etc, to work directly with allocated patients or
+                    programme participants under GoldenLife Victors'
+                    supervision.
                   </p>
                 </div>
                 <div>

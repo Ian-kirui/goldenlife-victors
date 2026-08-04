@@ -42,7 +42,7 @@ export const ProgrammeData: {
   };
 }[] = [
   {
-    image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
+    image: "/images/all/3.jpg",
     title: "IMARA Program – Indigenous Recovery & Awareness",
     slug: "imara",
     text: "Our flagship initiative delivering culturally responsive, community-driven addiction recovery and mental health awareness to Kenya's pastoralist and indigenous communities.",
@@ -56,12 +56,12 @@ export const ProgrammeData: {
     },
   },
   {
-    image: "https://www.goldenlifekenya.org/images/watoto.jpg",
+    image: "/images/all/watoto2.jpg",
     title: "Roots & Wings – School & Youth Therapy",
     slug: "roots-wings",
     text: "Supporting children, students, parents, and teachers to overcome emotional, behavioural, and social challenges. Empowering young people in and out of school to manage emotions, resolve conflict, and grow into healthy adults.",
-    raised: "$14,700",
-    goal: "$27,000",
+    raised: "10 Schools",
+    goal: "25 Schools",
     detail: {
       introduction: "Roots & Wings combines school-based therapy and youth empowerment into one comprehensive programme for Kenya's young people. Children and adolescents today face mounting pressures — academic stress, family instability, peer influence, and exposure to substance use — often without the tools or safe spaces to process these challenges. Roots & Wings provides structured, therapeutic support to children, students, parents, and teachers, creating school and community environments where young people can truly thrive.",
       impact: "Young people supported through Roots & Wings show measurable improvements in emotional regulation, conflict resolution, and academic engagement. Teachers report more cohesive classrooms and parents note stronger communication at home. By intervening early, we break cycles of trauma, substance experimentation, and disengagement before they become entrenched. The ripple effect of one supported child extends to their family, their peers, and ultimately their community.",
@@ -70,12 +70,12 @@ export const ProgrammeData: {
     },
   },
   {
-    image: "https://www.goldenlifekenya.org/images/children.jpg",
+    image: "/images/all/religion.jpg",
     title: "Wellness Warriors – Men's Mental Health",
     slug: "wellness-warriors",
     text: "A safe space for men to share experiences, learn from peers and professionals, and challenge the stigma around male mental health. Because strength includes asking for help.",
-    raised: "$7,400",
-    goal: "$14,000",
+    raised: "470 Men Reached",
+    goal: "700 Men",
     detail: {
       introduction: "Men in Kenya — and across Africa — carry a disproportionate burden of unaddressed mental health challenges, substance use, and emotional suppression, largely because cultural norms discourage men from seeking help. Wellness Warriors is GoldenLife Victors' dedicated men's mental health programme, creating structured, stigma-free environments where men can be honest about their struggles, access professional support, and find solidarity with peers who understand their journey.",
       impact: "Men who engage with Wellness Warriors report reduced substance use, improved family relationships, and a renewed sense of purpose and responsibility. Many participants go on to become peer mentors within their communities, multiplying the programme's reach organically. By changing how men relate to their own mental health, we transform homes, workplaces, and communities — because a mentally healthy man is a stronger father, partner, colleague, and community member.",
@@ -84,12 +84,12 @@ export const ProgrammeData: {
     },
   },
   {
-    image: "https://www.goldenlifekenya.org/images/shakahola2.jpg",
+    image: "/images/all/church.jpg",
     title: "Spiritual Heal & Mending Minds – Faith & Family",
     slug: "spiritual-family",
     text: "Integrating mental health support within faith communities and families. We help faith leaders care for themselves and discern when congregants need professional care, while strengthening family bonds through open communication and healthy boundaries.",
-    raised: "$14,600",
-    goal: "$26,000",
+    raised: "1200 People",
+    goal: "3000 People",
     detail: {
       introduction: "Faith and family are the two most powerful anchors in the lives of most Kenyans — and yet both can be sources of immense stress, unspoken pain, and unmet mental health needs. Spiritual Heal works within religious communities to equip faith leaders with mental health awareness and self-care tools, while Mending Minds focuses on family systems — helping households navigate conflict, addiction, grief, and communication breakdown with professional therapeutic support.",
       impact: "Faith leaders who participate in Spiritual Heal are better equipped to support their congregations while protecting their own mental health. Churches and mosques become safer places where congregants can openly discuss struggles without fear of judgement. Through Mending Minds, families develop healthier communication patterns, resolve long-standing conflicts, and rebuild trust — particularly in households affected by a member's substance use disorder, where the whole family unit needs healing, not just the individual.",
@@ -98,12 +98,12 @@ export const ProgrammeData: {
     },
   },
   {
-    image: "https://www.goldenlifekenya.org/images/3.jpg",
+    image: "/images/all/baby_therapy.jpg",
     title: "BeyondBump & Empowered Minds – Mothers & Workplaces",
     slug: "beyond-empowered",
     text: "Preparing mothers-to-be for childbirth and parenthood through mental health awareness and community support, while helping employers and employees build healthy work environments through coaching and stress management.",
-    raised: "$15,950",
-    goal: "$31,500",
+    raised: "170 Mothers",
+    goal: "500 Mothers",
     detail: {
       introduction: "BeyondBump addresses the mental health of mothers — from pregnancy through the early years of parenthood — at a time when women are most vulnerable to anxiety, depression, and isolation. Empowered Minds takes mental health into the workplace, where stress, burnout, and unaddressed emotional challenges cost organisations and individuals deeply. Together, these programmes extend GoldenLife Victors' reach into two environments where mental health is rarely prioritised but urgently needed.",
       impact: "BeyondBump participants report lower rates of perinatal anxiety and postpartum depression, stronger bonding with their newborns, and greater confidence as new mothers. Community support circles created through BeyondBump become lasting networks of mutual encouragement. Empowered Minds has helped organisations reduce absenteeism, improve team communication, and build cultures where employees feel psychologically safe — translating directly into productivity and staff retention.",
@@ -112,12 +112,12 @@ export const ProgrammeData: {
     },
   },
   {
-    image: "https://www.goldenlifekenya.org/images/shakahola.jpg",
+    image: "/images/all/mh4.jpg",
     title: "Mental Shift – Rehabilitation Therapy",
     slug: "mental-shift",
     text: "Recovery and rehabilitation for individuals struggling with substance use disorders through detox, therapy, and the 'Adopt an Addict' initiative — meeting people where they are and walking with them to lasting change.",
-    raised: "$10,200",
-    goal: "$25,000",
+    raised: "4000 Patients",
+    goal: "8000 Patients",
     detail: {
       introduction: "Mental Shift is GoldenLife Victors' dedicated rehabilitation therapy programme for individuals living with alcohol and substance use disorder. Rooted in compassion rather than judgement, Mental Shift recognises addiction as a health condition requiring structured clinical care, psychological support, and genuine human connection. The programme's 'Adopt an Addict' initiative pairs recovering individuals with consistent mentors — professionals and trained community members who walk alongside them through every stage of recovery.",
       impact: "Participants in Mental Shift's structured rehabilitation pathway show significantly improved rates of sustained sobriety compared to those who attempt recovery without support. Families of participants also benefit — as their loved one's recovery progresses, household stability, economic productivity, and relational trust are restored. The 'Adopt an Addict' model creates accountable, dignified relationships that outlast the formal programme period, reducing relapse rates and building long-term resilience.",

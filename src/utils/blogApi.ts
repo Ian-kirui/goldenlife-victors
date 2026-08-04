@@ -73,7 +73,18 @@ function normalise(post: any): Post {
 }
 
 function normaliseAll(posts: any[]): Post[] {
-  return Array.isArray(posts) ? posts.map(normalise) : [];
+  if (!Array.isArray(posts)) return [];
+  const normalised = posts.map(normalise);
+  // Sort latest first by dateCreated; reverse insertion order if no dates present
+  const hasDate = normalised.some((p) => !!p.dateCreated);
+  if (hasDate) {
+    return [...normalised].sort((a, b) => {
+      const da = a.dateCreated ? new Date(a.dateCreated).getTime() : 0;
+      const db = b.dateCreated ? new Date(b.dateCreated).getTime() : 0;
+      return db - da;
+    });
+  }
+  return [...normalised].reverse();
 }
 
 /**
