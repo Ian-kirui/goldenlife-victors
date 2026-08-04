@@ -198,7 +198,7 @@ const Header: React.FC = () => {
             {/* Theme toggle */}
             <button
               aria-label="Toggle theme"
-              onClick={() => setTheme(theme === "dark" ? "light" : "light")}
+              onClick={() => setTheme(theme === "light" ? "light" : "light")}
               className="flex h-8 w-8 items-center justify-center text-body-color duration-300 dark:text-white"
             >
               <svg
