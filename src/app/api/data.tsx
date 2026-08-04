@@ -143,7 +143,7 @@ export const CauseData: {
   };
 }[] = [
   {
-    image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
+    image: "/images/all/addict.jpg",
     title: "People Reached",
     slug: "people-reached",
     text: "Individuals across Kenya's communities who have received awareness, support, or intervention through our programmes.",
@@ -157,7 +157,7 @@ export const CauseData: {
     },
   },
   {
-    image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
+    image: "/images/all/addict.jpg",
     title: "People Treated",
     slug: "people-treated",
     text: "Individuals who have undergone structured treatment and achieved lasting change through our rehabilitation and therapy programmes.",
@@ -171,7 +171,7 @@ export const CauseData: {
     },
   },
   {
-    image: "https://www.goldenlifekenya.org/images/20221121_122506.jpg",
+    image: "/images/all/addict.jpg",
     title: "Communities Reached",
     slug: "places-reached",
     text: "Towns, villages, schools, workplaces, and faith communities across Kenya where GoldenLife Victors has delivered direct impact.",
@@ -209,7 +209,7 @@ export const Reviews: {
   post: string;
 }[] = [
   {
-    clientImg: "/images/testimonial/client-1.jpg",
+    clientImg: "/images/all/jamila.png",
     clientName: "Jamilla Angela",
     review:
       "With Community, healing happens in connection — we build supportive networks that lasts.",

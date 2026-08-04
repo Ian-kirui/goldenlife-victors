@@ -76,13 +76,23 @@ function normaliseAll(posts: any[]): Post[] {
   return Array.isArray(posts) ? posts.map(normalise) : [];
 }
 
-/** Sort events latest first */
+/**
+ * Sort events latest first.
+ * EventResponse does not include dateCreated — the API returns events in
+ * insertion order (oldest first). Reversing gives latest first reliably
+ * until the backend adds a dateCreated field to EventResponse.
+ */
 function sortEvents(events: Event[]): Event[] {
-  return events.sort((a, b) => {
-    const da = a.dateCreated ? new Date(a.dateCreated).getTime() : 0;
-    const db = b.dateCreated ? new Date(b.dateCreated).getTime() : 0;
-    return db - da;
-  });
+  // If dateCreated is present on any item, use it; otherwise reverse insertion order
+  const hasDate = events.some((e) => !!e.dateCreated);
+  if (hasDate) {
+    return [...events].sort((a, b) => {
+      const da = a.dateCreated ? new Date(a.dateCreated).getTime() : 0;
+      const db = b.dateCreated ? new Date(b.dateCreated).getTime() : 0;
+      return db - da;
+    });
+  }
+  return [...events].reverse();
 }
 
 /** Events are wrapped: { status, message, data: EventResponse | EventResponse[] } */

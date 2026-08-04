@@ -5,7 +5,7 @@ const PARTNER_FORM_URL = "https://forms.gle/your-form-id";
 
 const UrgentDonation = () => {
   return (
-    <section className="bg-[url('https://www.goldenlifekenya.org/images/20221121_122506.jpg')] bg-cover sm:py-52 lg:py-28 py-16 bg-no-repeat">
+    <section className="bg-[url('/images/all/volunt2.jpg')] bg-cover sm:py-52 lg:py-28 py-16 bg-no-repeat">
       <div className="container mx-auto lg:max-w-(--breakpoint-xl) px-4">
         <div className="bg-white dark:bg-dark max-w-29 w-full px-10 py-14 rounded-lg text-center mx-auto" data-aos="fade-right">
           <h3 className="sm:text-2xl text-lg font-bold mb-5">

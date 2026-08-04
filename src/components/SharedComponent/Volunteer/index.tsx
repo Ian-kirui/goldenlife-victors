@@ -5,7 +5,7 @@ const VOLUNTEER_FORM_URL = "https://forms.gle/your-form-id";
 
 const Volunteer = () => {
   return (
-    <section className="lg:py-28 py-16 bg-[url('https://www.goldenlifekenya.org/images/20221121_122506.jpg')] bg-no-repeat bg-cover overflow-hidden">
+    <section className="lg:py-28 py-16 bg-[url('/images/all/religion.jpg')] bg-no-repeat bg-cover overflow-hidden">
       <div className="container mx-auto lg:max-w-(--breakpoint-xl) px-4">
         <div className="text-center">
           <h2 className="text-3xl font-medium text-white mb-6">
