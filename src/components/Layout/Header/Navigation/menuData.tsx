@@ -6,7 +6,11 @@ export const headerData: HeaderItem[] = [
   {
     label: "Programmes",
     href: "/programmes",
-    
+    submenu: [
+      { label: "Clinical Recovery & Rehabilitation", href: "/programmes/clinical-recovery" },
+      { label: "Community & Preventive Outreach", href: "/programmes/community-outreach" },
+      { label: "Global Practices", href: "/programmes/global-practices" },
+    ],
   },
   {
     label: "Events",
@@ -15,10 +19,7 @@ export const headerData: HeaderItem[] = [
   {
     label: "Blog",
     href: "/blog",
-    // submenu: [
-    //   { label: "Blog list", href: "/blog" },
-    //   { label: "Blog details", href: "/blog/blog_1" },
-    // ],
+    
   },
   { label: "Gallery", href: "/gallery" },
   { label: "Contact", href: "/contact" },
