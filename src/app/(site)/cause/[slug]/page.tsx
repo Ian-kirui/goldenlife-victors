@@ -98,7 +98,7 @@ const Cause = () => {
                                         <Link href="#" className="text-base text-muted dark:text-white/60 hover:text-primary">Healthcare</Link>
                                     </li>
                                     <li>
-                                        <Link href="#" className="text-base text-muted dark:text-white/60 hover:text-primary">Programs</Link>
+                                        <Link href="#" className="text-base text-muted dark:text-white/60 hover:text-primary">Programmes</Link>
                                     </li>
                                 </ul>
                             </div>

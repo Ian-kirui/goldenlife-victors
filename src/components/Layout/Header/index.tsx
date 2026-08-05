@@ -330,12 +330,12 @@ const Header: React.FC = () => {
                 </Link>
               </div>
             </div>
-            <button
+            {/* <button
               onClick={() => donationInfo?.setIsDonationOpen(true)}
               className="text-error text-sm font-semibold border border-error py-4 px-7 rounded-md ml-8 hover:bg-error hover:text-white"
             >
               Support Us
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

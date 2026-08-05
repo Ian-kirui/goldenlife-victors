@@ -39,7 +39,7 @@ const UrgentDonation = () => {
               href="/programmes"
               className="px-7 border text-sm font-semibold border-primary text-primary py-4 rounded-sm hover:bg-primary hover:text-white transition-all duration-300"
             >
-              Our Programs
+              Our Programmes
             </Link>
           </div>
         </div>

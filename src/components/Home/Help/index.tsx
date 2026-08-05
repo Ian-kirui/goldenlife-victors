@@ -10,7 +10,7 @@ const Help = () => {
                         GoldenLife Victors
                     </h2>
                     <p className="text-muted dark:text-white/60 text-base">
-                    Our mission focuses on mental health issues and community wellness programs that foster mental well-being and growth.<br className="lg:block hidden" /> Our core areas of support include:
+                    Our mission focuses on mental health issues and community wellness programmes that foster mental well-being and growth.<br className="lg:block hidden" /> Our core areas of support include:
                     </p>
                     <div className="mt-20 grid grid-cols-12 gap-8">
                         {helpdata.map((item, index) => (

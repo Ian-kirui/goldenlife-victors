@@ -121,7 +121,7 @@ const Programme = () => {
                       href="#"
                       className="text-base text-muted dark:text-white/60 hover:text-primary"
                     >
-                      Programs
+                      Programmes
                     </Link>
                   </li>
                 </ul>

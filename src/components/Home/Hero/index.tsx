@@ -35,14 +35,14 @@ const Hero = () => {
 
             <p className="text-muted dark:text-white/60 text-base mb-5">
               GoldenLife Victors is dedicated to transforming lives through accessible,
-              compassionate, and world-class mental health and wellness programs —
+              compassionate, and world-class mental health and wellness programmes —
               empowering individuals and communities to thrive in mind, body, and spirit.
             </p>
 
             <div className="grid grid-cols-2 border-t border-border dark:border-dark_border mb-5">
               <div className="col-span-1 border-r border-border dark:border-dark_border px-5 py-4">
                 <p className="text-xs text-muted dark:text-white/60 mb-1">
-                  Programs
+                  Programmes
                 </p>
                 <h4 className="text-2xl text-secondary">8+ Active</h4>
               </div>
@@ -55,12 +55,12 @@ const Hero = () => {
             </div>
 
             <div className="flex justify-center">
-              <button
-                onClick={() => donationInfo?.setIsDonationOpen(true)}
+              <Link
+                href={"/programmes"}
                 className="text-white bg-linear-to-r text-sm from-error to-warning px-7 py-4 hover:from-white hover:to-white dark:hover:from-dark dark:hover:to-dark border font-semibold border-transparent hover:border-error hover:text-error rounded-md"
               >
-                Support Our Mission
-              </button>
+                Our Programmes
+              </Link>
               <Test />
             </div>
           </div>
