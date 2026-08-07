@@ -19,12 +19,12 @@ export const metadata: Metadata = {
     "GoldenLife Victors",
     "mental health Kenya",
     "rehabilitation center",
-    "community wellness programs",
+    "community wellness programmes",
     "Addiction recovery",
     "psychological therapy",
     "counseling services",
     "mental health awareness",
-    "wellness programs",
+    "wellness programmes",
     "mental health organization Africa",
     "Adopt an Addict initiative",
     "youth therapy",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "GoldenLife Victors | Transforming Lives Through Mental Wellness",
     description:
-      "Empowering communities through therapy, rehabilitation, and outreach programs that promote holistic mental health and recovery. Be part of the movement towards mental wellness for all.",
+      "Empowering communities through therapy, rehabilitation, and outreach programmes that promote holistic mental health and recovery. Be part of the movement towards mental wellness for all.",
     url: "https://goldenlifevictors.org",
     siteName: "GoldenLife Victors",
     images: [
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "GoldenLife Victors | Promoting Mental Health & Wellness",
     description:
-      "GoldenLife Victors provides compassionate mental health care, rehabilitation, and community wellness programs across Africa.",
+      "GoldenLife Victors provides compassionate mental health care, rehabilitation, and community wellness programmes across Africa.",
     images: ["/images/og/og-banner.jpg"],
     creator: "@GoldenLifeVictors",
   },
