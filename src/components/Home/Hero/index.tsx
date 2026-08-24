@@ -21,22 +21,24 @@ const Hero = () => {
             <div className="flex justify-between mb-6">
               <div className="px-4 py-2 bg-midnight_text rounded-sm">
                 <p className=" text-white text-sm font-semibold">
-                  About GoldenLife Victors
+                  Mental Wellness for All
                 </p>
               </div>
-              <p className="text-muted dark:text-white/60 text-xs font-medium">
+              {/* <p className="text-muted dark:text-white/60 text-xs font-medium">
                 Mental Wellness for All
-              </p>
+              </p> */}
             </div>
 
             <h3 className="text-midnight_text dark:text-white text-lg font-bold mb-6">
-              Building a World Where Mental Health Matters
+              Restoring Hope, Rebuilding Lives: Integrated Mental Healthcare &
+              Rehabilitation Across Kenya.
             </h3>
 
             <p className="text-muted dark:text-white/60 text-base mb-5">
-              GoldenLife Victors is dedicated to transforming lives through accessible,
-              compassionate, and world-class mental health and wellness programmes —
-              empowering individuals and communities to thrive in mind, body, and spirit.
+              Goldenlife Victors combines evidence-based inpatient addiction
+              recovery at our Naivasha facility with grassroots community
+              prevention, family counseling, and professional mental health
+              training.
             </p>
 
             <div className="grid grid-cols-2 border-t border-border dark:border-dark_border mb-5">
@@ -50,7 +52,9 @@ const Hero = () => {
                 <p className="text-xs text-muted dark:text-white/60 mb-1">
                   Communities Reached
                 </p>
-                <h4 className="text-2xl text-midnight_text dark:text-white">15+</h4>
+                <h4 className="text-2xl text-midnight_text dark:text-white">
+                  15+
+                </h4>
               </div>
             </div>
 
@@ -59,7 +63,7 @@ const Hero = () => {
                 href={"/programmes"}
                 className="text-white bg-linear-to-r text-sm from-error to-warning px-7 py-4 hover:from-white hover:to-white dark:hover:from-dark dark:hover:to-dark border font-semibold border-transparent hover:border-error hover:text-error rounded-md"
               >
-                Our Programmes
+                Treatments
               </Link>
               <Test />
             </div>

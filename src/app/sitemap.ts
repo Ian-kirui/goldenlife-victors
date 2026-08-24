@@ -2,8 +2,7 @@ import { MetadataRoute } from "next";
 import { getAllPublicPosts } from "@/utils/blogApi";
 import { getPublicEvents } from "@/utils/blogApi";
 
-
-const BASE_URL = "https://www.goldenlifevictors.org";
+const BASE_URL = "https://www.goldenlifekenya.org";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ── Static routes ──────────────────────────────────────────────────────────

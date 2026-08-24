@@ -9,7 +9,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "About Us | GoldenLife Victors",
   description:
-    "Learn about GoldenLife Victors — our story, mission, vision, and our approach to alcohol and substance use disorder rehabilitation in Kenya.",
+    "GoldenLife Victors is an integrated mental healthcare, rehabilitation, and community wellness organisation dedicated to restoring human dignity across Kenya.",
 };
 
 const pillars = [
@@ -21,8 +21,8 @@ const pillars = [
       </svg>
     ),
     label: "Our Story",
-    heading: "Where it all began",
-    body: "GoldenLife Victors began with the aim of providing integrated, world-class quality and exceptional services on mental health and well-being — anywhere — through our all-time available professionals. The Travel Psychologists.",
+    heading: "Bridging the gap in Mental Health & Recovery",
+    body: "GoldenLife Victors was established to address a critical gap in society: the need for accessible, dignified, and evidence-based mental health and addiction recovery services — replacing stigma with support, and despair with restored purpose.",
   },
   {
     icon: (
@@ -32,31 +32,56 @@ const pillars = [
       </svg>
     ),
     label: "Our Mission",
-    heading: "Care without borders",
-    body: "Our mission is to create a world where mental health is viewed with the same importance as physical health — where individuals receive accessible, compassionate and effective care and where stigma is eliminated.",
+    heading: "Evidence-based care for every stage of life",
+    body: "To deliver evidence-based clinical rehabilitation, community prevention programmes, and professional mental health capacity building that empower individuals and families to thrive in mind, body, and spirit.",
   },
   {
     icon: (
       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
       </svg>
     ),
     label: "Our Vision",
-    heading: "World-class excellence",
-    body: "Our vision is to become a world-class centre of excellence in mental health and well-being — a beacon of hope and healing that reaches communities across Africa and beyond.",
+    heading: "A world where mental health is prioritised",
+    body: "A world where mental health is prioritised, stigma is dismantled, and every individual has access to compassionate, holistic recovery and wellness.",
   },
 ];
 
 const values = [
-  { title: "Compassion",    desc: "We approach every individual with empathy, dignity and genuine care." },
-  { title: "Excellence",    desc: "We uphold the highest professional standards in everything we do." },
-  { title: "Accessibility", desc: "Mental health support should be available to everyone, everywhere." },
-  { title: "Community",     desc: "Healing happens in connection — we build supportive networks that last." },
-  { title: "Integrity",     desc: "We operate with transparency, honesty and accountability at all times." },
-  { title: "Innovation",    desc: "We embrace new ideas, research and methods to continuously improve care." },
+  { title: "Dignity & Compassion",        desc: "We treat every client with unconditional respect, creating a safe, non-judgmental space for healing." },
+  { title: "Evidence-Based Excellence",   desc: "Our clinical interventions integrate proven medical, psychological, and therapeutic practices." },
+  { title: "Holistic Restorative Care",   desc: "We address the whole person — bridging physical recovery, emotional resilience, family reintegration, and spiritual well-being." },
+  { title: "Community-Rooted Action",     desc: "We believe true prevention happens where people live, work, learn, and worship." },
+  { title: "Integrity & Accountability",  desc: "We maintain the highest ethical standards in patient care, financial management, and institutional partnerships." },
+];
+
+const facilityFeatures = [
+  { feature: "Multidisciplinary Team",   benefit: "Led by ICAP-certified addiction professionals, psychiatric nurse specialists, and clinical psychologists." },
+  { feature: "Serene Environment",       benefit: "Located in Naivasha, offering a tranquil, nature-surrounded setting ideal for rest, reflection, and focus." },
+  { feature: "High Privacy & Dignity",   benefit: "Strict confidentiality protocols to protect client identity and ensure a safe, non-judgmental space." },
+  { feature: "Holistic Integration",     benefit: "Medical, psychological, social, and spiritual dimensions of health addressed under one care plan." },
+];
+
+const careModel = [
+  {
+    num: "01",
+    title: "Clinical Excellence",
+    sub: "Inpatient & Outpatient",
+    body: "At our facility in Naivasha, we offer structured residential rehabilitation for Alcohol and Substance Use Disorders (SUD), dual diagnosis care, and structured counselling. Our multidisciplinary care plans combine medical detoxification, individual psychotherapy, group therapy, life skills training, and structured family reintegration support.",
+  },
+  {
+    num: "02",
+    title: "Preventive Community Mental Health",
+    sub: "IMARA Programme & Outreach",
+    body: "We don't wait for crisis to strike. Through our community outreach arm — anchored by our flagship IMARA Programme — we take mental health education, addiction awareness, and psychological support directly into schools, youth groups, workplaces, faith communities, and underserved pastoralist settlements.",
+  },
+  {
+    num: "03",
+    title: "Capacity Building & Global Practices",
+    sub: "Training, Research & Consultancy",
+    body: "As an innovation and learning hub, GoldenLife Victors advances local mental healthcare by providing training, research platforms, and consultancy for healthcare workers, institutions, community leaders, and international volunteers.",
+  },
 ];
 
 export default function AboutPage() {
@@ -71,16 +96,19 @@ export default function AboutPage() {
             <div data-aos="fade-right" data-aos-duration="1000">
               <p className="text-primary text-base font-medium mb-3">Who We Are</p>
               <h2 className="text-4xl font-bold text-midnight_text dark:text-white mb-6 leading-tight">
-                Transforming lives through rehabilitation & partnership
+                Driven by Compassion, Grounded in Science, Committed to Lasting Healing.
               </h2>
               <p className="text-muted dark:text-white/70 text-base leading-relaxed mb-4">
-                GoldenLife Victors is a world-class organisation specialising in alcohol and substance use disorder
-                rehabilitation, community outreach, and global mental health practices. We reach individuals wherever
-                they are — through our inpatient hospital in Naivasha and through community-based programmes across Kenya.
+                We are an integrated mental healthcare, rehabilitation, and community wellness organisation
+                dedicated to restoring human dignity across Kenya — from our specialised inpatient facility
+                in Naivasha to grassroots communities.
               </p>
               <p className="text-muted dark:text-white/70 text-base leading-relaxed mb-6">
-                Our work is powered not by donations, but by <strong className="text-primary">partnerships</strong> —
-                professionals, volunteers, and organisations who share our vision and work alongside us to restore lives.
+                Addiction and mental health challenges do not just affect an individual — they impact entire
+                families and destabilise whole communities. GoldenLife Victors operates as a dual-impact
+                organisation: delivering high-quality clinical rehabilitation while actively deploying
+                preventive, community-driven mental health initiatives across schools, workplaces, faith
+                organisations, and hard-to-reach pastoralist regions.
               </p>
               <div className="grid grid-cols-3 gap-6 mt-8">
                 {[
@@ -100,8 +128,7 @@ export default function AboutPage() {
                 <Image
                   src="https://www.goldenlifekenya.org/images/shakahola2.jpg"
                   alt="GoldenLife Victors team"
-                  width={600}
-                  height={500}
+                  width={600} height={500}
                   className="w-full h-[420px] object-cover"
                 />
               </div>
@@ -114,67 +141,83 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Rehabilitation Approach ── */}
+      {/* ── Healing in Connection narrative ── */}
       <section className="py-20 bg-SnowySky dark:bg-darklight px-4">
         <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md)">
-          <div className="text-center mb-14">
-            <p className="text-primary text-base font-medium mb-3">Our Core Focus</p>
-            <h2 className="text-4xl font-bold text-midnight_text dark:text-white">
-              Rehabilitation — Two Pathways to Recovery
+          <div className="max-w-3xl mx-auto text-center" data-aos="fade-up" data-aos-duration="1000">
+            <p className="text-primary text-base font-medium mb-3">Our Approach</p>
+            <h2 className="text-4xl font-bold text-midnight_text dark:text-white mb-6">
+              Healing in Connection, Restoring Human Dignity
             </h2>
-            <p className="text-muted dark:text-white/70 text-base mt-4 max-w-2xl mx-auto">
-              We specialise in alcohol and substance use disorder rehabilitation through two complementary approaches,
-              ensuring no one is left behind regardless of the severity of their situation.
+            <p className="text-muted dark:text-white/70 text-base leading-relaxed mb-4">
+              Mental health challenges and addiction do not exist in isolation — they affect individuals,
+              families, and entire communities. GoldenLife Victors bridges the gap between clinical excellence
+              and grassroots access.
+            </p>
+            <p className="text-muted dark:text-white/70 text-base leading-relaxed">
+              Operating from our inpatient facility in Naivasha, Kenya, and out in the field across remote,
+              pastoralist, urban, and institutional settings, we provide compassionate, multi-disciplinary care
+              tailored to every stage of recovery.
             </p>
           </div>
-          <div className="grid lg:grid-cols-2 grid-cols-1 gap-8">
-            {/* Inpatient */}
-            <div className="bg-white dark:bg-dark rounded-2xl p-8 shadow-sm border border-border dark:border-dark_border hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="0" data-aos-duration="1000">
-              <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-5">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <span className="text-xs font-semibold uppercase tracking-widest text-primary mb-2 block">Pathway 1</span>
-              <h3 className="text-xl font-bold text-midnight_text dark:text-white mb-3">Inpatient Hospital</h3>
-              <p className="text-muted dark:text-white/70 text-base leading-relaxed mb-4">
-                Our inpatient facility in <strong>Naivasha, Kenya</strong> provides structured, full-time residential
-                rehabilitation for individuals requiring intensive care and a safe environment to recover from alcohol
-                and substance use disorder.
-              </p>
-              <p className="text-muted dark:text-white/70 text-sm leading-relaxed mb-5 italic">
-                Note: When using maps to find us, please call ahead to confirm the best route — GPS directions can
-                sometimes suggest longer routes to our location.
-              </p>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:underline"
-              >
-                Get directions & contact us →
-              </Link>
-            </div>
+        </div>
+      </section>
 
-            {/* Community */}
-            <div className="bg-white dark:bg-dark rounded-2xl p-8 shadow-sm border border-border dark:border-dark_border hover:shadow-md transition-shadow" data-aos="fade-up" data-aos-delay="150" data-aos-duration="1000">
-              <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-5">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <span className="text-xs font-semibold uppercase tracking-widest text-primary mb-2 block">Pathway 2</span>
-              <h3 className="text-xl font-bold text-midnight_text dark:text-white mb-3">Community Rehabilitation</h3>
-              <p className="text-muted dark:text-white/70 text-base leading-relaxed mb-4">
-                Our teams go directly into communities to identify and support individuals and groups dealing with
-                alcohol and substance use disorder. Those who can be helped through community-level care receive
-                support on the ground. Those who need more are referred to our inpatient facility.
-              </p>
-              <Link
-                href="/programmes"
-                className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:underline"
+      {/* ── Model of Care ── */}
+      <section className="py-20 dark:bg-dark px-4">
+        <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md)">
+          <div className="text-center mb-14" data-aos="fade-up">
+            <p className="text-primary text-base font-medium mb-3">How We Work</p>
+            <h2 className="text-4xl font-bold text-midnight_text dark:text-white">Our Integrated Model of Care</h2>
+          </div>
+          <div className="grid lg:grid-cols-3 grid-cols-1 gap-8">
+            {careModel.map((c, i) => (
+              <div key={c.num}
+                className="bg-white dark:bg-dark rounded-2xl p-8 border border-border dark:border-dark_border hover:shadow-md transition-shadow"
+                data-aos="fade-up" data-aos-delay={`${i * 120}`} data-aos-duration="1000"
               >
-                View our community programmes →
-              </Link>
-            </div>
+                <span className="text-4xl font-black text-primary/20 block mb-4">{c.num}</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-primary mb-1 block">{c.sub}</span>
+                <h3 className="text-xl font-bold text-midnight_text dark:text-white mb-3">{c.title}</h3>
+                <p className="text-muted dark:text-white/70 text-sm leading-relaxed">{c.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Naivasha Facility ── */}
+      <section className="py-20 bg-SnowySky dark:bg-darklight px-4">
+        <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md)">
+          <div className="text-center mb-14" data-aos="fade-up">
+            <p className="text-primary text-base font-medium mb-3">Our Inpatient Facility</p>
+            <h2 className="text-4xl font-bold text-midnight_text dark:text-white">What Sets Our Naivasha Facility Apart</h2>
+          </div>
+          <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
+            {facilityFeatures.map((f, i) => (
+              <div key={f.feature}
+                className="bg-white dark:bg-dark rounded-2xl p-6 border border-border dark:border-dark_border hover:border-primary transition-colors group"
+                data-aos="fade-up" data-aos-delay={`${i * 100}`} data-aos-duration="1000"
+              >
+                <div className="flex gap-4">
+                  <div className="w-2 rounded-full bg-primary shrink-0 group-hover:bg-secondary transition-colors" />
+                  <div>
+                    <h4 className="font-bold text-midnight_text dark:text-white mb-1">{f.feature}</h4>
+                    <p className="text-muted dark:text-white/70 text-sm leading-relaxed">{f.benefit}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <p className="text-sm text-muted dark:text-white/60 italic mb-4">
+              Note: When using maps to find us, please call ahead to confirm the best route — GPS directions can
+              sometimes suggest longer routes to our Naivasha location.
+            </p>
+            <Link href="/contact"
+              className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:underline">
+              Get directions & contact us →
+            </Link>
           </div>
         </div>
       </section>
@@ -182,7 +225,7 @@ export default function AboutPage() {
       {/* ── Story / Mission / Vision ── */}
       <section className="py-20 dark:bg-dark px-4">
         <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md)">
-          <div className="text-center mb-14">
+          <div className="text-center mb-14" data-aos="fade-up">
             <p className="text-primary text-base font-medium mb-3">Our Foundation</p>
             <h2 className="text-4xl font-bold text-midnight_text dark:text-white">Story, Mission & Vision</h2>
           </div>
@@ -202,10 +245,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Core values ── */}
+      {/* ── Core Values (VICTORS Framework) ── */}
       <section className="py-20 bg-SnowySky dark:bg-darklight px-4">
         <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md)">
-          <div className="text-center mb-14">
+          <div className="text-center mb-14" data-aos="fade-up">
             <p className="text-primary text-base font-medium mb-3">What Drives Us</p>
             <h2 className="text-4xl font-bold text-midnight_text dark:text-white">Our Core Values</h2>
           </div>
@@ -222,6 +265,25 @@ export default function AboutPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Leadership note ── */}
+      <section className="py-16 dark:bg-dark px-4">
+        <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md)">
+          <div className="bg-primary rounded-2xl px-8 py-12 text-center text-white" data-aos="fade-up">
+            <p className="text-xs font-bold uppercase tracking-widest text-white/70 mb-3">Our Team</p>
+            <h3 className="text-3xl font-bold mb-4">Guided by Professional Leadership & Passion</h3>
+            <p className="text-white/80 text-base max-w-2xl mx-auto mb-6">
+              Our strength lies in our multidisciplinary team of psychiatrists, psychiatric nurse specialists,
+              ICAP-certified addiction professionals, medical doctors, clinical psychologists, counsellors,
+              and community health champions.
+            </p>
+            <Link href="/about/our-board"
+              className="inline-block bg-white text-primary font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+              Meet Our Board →
+            </Link>
           </div>
         </div>
       </section>
