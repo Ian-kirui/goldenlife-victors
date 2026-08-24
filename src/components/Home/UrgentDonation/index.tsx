@@ -36,10 +36,10 @@ const UrgentDonation = () => {
               Become a Partner
             </Link>
             <Link
-              href="/programmes"
+              href="/treatments"
               className="px-7 border text-sm font-semibold border-primary text-primary py-4 rounded-sm hover:bg-primary hover:text-white transition-all duration-300"
             >
-              Our Programmes
+              Our Treatments
             </Link>
           </div>
         </div>

@@ -123,7 +123,7 @@ export default function IMARABanner() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <Link href="/programmes/imara" onClick={() => setOpen(false)}
+                <Link href="/treatments/imara" onClick={() => setOpen(false)}
                   className="flex-1 text-center bg-primary hover:bg-darkprimary text-white font-semibold py-3 rounded-lg transition-colors text-sm">
                   Learn More About IMARA
                 </Link>

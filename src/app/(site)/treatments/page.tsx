@@ -5,7 +5,7 @@ import Link from "next/link";
 import { pillars } from "@/app/api/programmes-data";
 
 export const metadata: Metadata = {
-  title: "Programmes | GoldenLife Victors",
+  title: "Treatments | GoldenLife Victors",
   description: "Three pillars of care — Clinical Recovery, Community Outreach, and Global Practices — delivering world-class mental health and rehabilitation services across Kenya.",
 };
 
@@ -18,7 +18,7 @@ const colorMap: Record<string, string> = {
 export default function ProgrammesPage() {
   return (
     <>
-      <HeroSub title="Our Programmes" />
+      <HeroSub title="Treatments" />
 
       <section className="py-20 dark:bg-dark px-4">
         <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md)">
@@ -46,7 +46,7 @@ export default function ProgrammesPage() {
                 <h3 className="text-2xl font-bold text-midnight_text dark:text-white mb-3">{p.title}</h3>
                 <p className="text-sm font-medium text-primary mb-3">{p.subtitle}</p>
                 <p className="text-muted dark:text-white/70 text-sm leading-relaxed mb-6 flex-1">{p.description}</p>
-                <Link href={`/programmes/${p.slug}`}
+                <Link href={`/treatments/${p.slug}`}
                   className="block text-center bg-primary hover:bg-darkprimary text-white font-medium py-3 rounded-lg transition-colors text-sm">
                   {p.cta} →
                 </Link>
@@ -62,7 +62,7 @@ export default function ProgrammesPage() {
               Indigenous Movement for Addiction Recovery & Awareness — our frontline initiative delivering
               culturally responsive, community-driven care to Kenya's pastoralist and indigenous communities.
             </p>
-            <Link href="/programmes/community-outreach"
+            <Link href="/treatments/community-outreach"
               className="inline-block bg-white text-primary font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
               Discover IMARA
             </Link>

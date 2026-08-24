@@ -8,7 +8,7 @@ const ProgrammeList = () => {
             <div className="container mx-auto lg:max-w-(--breakpoint-xl) px-4">
                 <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-8">
                     {ProgrammeData.map((item, index) => (
-                        <Link href={`/programmes/${item.slug}`} key={index} data-aos="fade-up" data-aos-delay={`${index * 100}`}>
+                        <Link href={`/treatments/${item.slug}`} key={index} data-aos="fade-up" data-aos-delay={`${index * 100}`}>
                             <div className="bg-white dark:bg-darkmode group h-full flex flex-col rounded-md">
                                 <div className="overflow-hidden flex-1">
                                     <Image

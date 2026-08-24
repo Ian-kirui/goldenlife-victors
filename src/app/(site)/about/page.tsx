@@ -72,9 +72,9 @@ const careModel = [
   },
   {
     num: "02",
-    title: "Preventive Community Mental Health",
-    sub: "IMARA Programme & Outreach",
-    body: "We don't wait for crisis to strike. Through our community outreach arm — anchored by our flagship IMARA Programme — we take mental health education, addiction awareness, and psychological support directly into schools, youth groups, workplaces, faith communities, and underserved pastoralist settlements.",
+    title: "IMARA Programme",
+    sub: "Indigenous & Pastoralist Community Recovery",
+    body: "Culturally responsive mobile wellness caravans delivering mental health education and addiction interventions directly into Kenya's pastoralist and hard-to-reach communities — working with traditional elders, women's leaders, and youth groups to embed mental wellness into the existing cultural fabric.",
   },
   {
     num: "03",

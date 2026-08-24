@@ -256,7 +256,7 @@ goldenlife-victors/
 | `/about` | About Us — story, mission, vision, values |
 | `/gallery` | Photo gallery by category |
 | `/contact` | Contact form |
-| `/cause` | Causes/programmes |
+| `/cause` | Causes/treatments |
 | `/signin` | Sign in |
 | `/signup` | Create account |
 | `/forgot-password` | Password reset request |

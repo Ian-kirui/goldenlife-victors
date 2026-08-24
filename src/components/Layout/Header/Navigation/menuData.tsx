@@ -10,24 +10,24 @@ export const headerData: HeaderItem[] = [
       },
       {
         label: "Our Services",
-        href: "/programmes",
+        href: "/treatments",
       },
       { label: "Our Facility", href: "/contact" },
     ],
    },
   {
     label: "Treatments",
-    href: "/programmes",
+    href: "/treatments",
     submenu: [
       {
         label: "Clinical Recovery & Rehabilitation",
-        href: "/programmes/clinical-recovery",
+        href: "/treatments/clinical-recovery",
       },
       {
         label: "Community & Preventive Outreach",
-        href: "/programmes/community-outreach",
+        href: "/treatments/community-outreach",
       },
-      { label: "Global Practices", href: "/programmes/global-practices" },
+      { label: "Global Practices", href: "/treatments/global-practices" },
     ],
   },
   {
