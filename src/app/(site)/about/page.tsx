@@ -126,7 +126,7 @@ export default function AboutPage() {
             <div className="relative" data-aos="fade-left" data-aos-duration="1000">
               <div className="rounded-2xl overflow-hidden">
                 <Image
-                  src="https://www.goldenlifekenya.org/images/shakahola2.jpg"
+                  src="/images/all/shakahola2.jpg"
                   alt="GoldenLife Victors team"
                   width={600} height={500}
                   className="w-full h-[420px] object-cover"

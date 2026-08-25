@@ -104,7 +104,7 @@ export const communityPrograms = [
     ctaLink: "/contact",
   },
   {
-    name: "Active Minds & Roots & Wings",
+    name: "Active Minds",
     tag: "Schools & Youth",
     audience: "Primary/secondary school students, adolescents, teachers, and parents.",
     focus: "Youth mental health literacy, emotional resilience, self-regulation, and substance use prevention.",

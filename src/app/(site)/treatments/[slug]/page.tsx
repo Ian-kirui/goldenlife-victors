@@ -58,8 +58,8 @@ const Programme = () => {
                   <div className="w-60% bg-linear-to-r from-primary to-secondary relative z-1 rounded-full h-full"></div>
                 </div>
               </div>
-              <FormPart />
               <TextPart detail={item.detail} />
+              <FormPart />
             </div>
             <div className="lg:col-span-3 col-span-12">
               <h4 className="text-lg font-medium mb-6">Search</h4>

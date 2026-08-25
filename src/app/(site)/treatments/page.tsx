@@ -14,7 +14,140 @@ const colorMap: Record<string, string> = {
   green:  "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800",
   purple: "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800",
 };
+const PillarIcons = [
+  // Clinical Recovery
+  <svg key="clinical" className="w-16 h-16" viewBox="0 0 64 64" fill="none">
+    <circle
+      cx="32"
+      cy="32"
+      r="25"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    />
+    <path
+      d="M32 18V30M26 24H38"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M18 40C22 35 27 34 32 38C37 34 42 35 46 40"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M22 43C25 47 29 49 32 49C35 49 39 47 42 43"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      opacity="0.6"
+    />
+  </svg>,
 
+  // Community
+  <svg key="community" className="w-16 h-16" viewBox="0 0 64 64" fill="none">
+    <circle
+      cx="32"
+      cy="18"
+      r="6"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    />
+    <circle
+      cx="15"
+      cy="30"
+      r="5"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    />
+    <circle
+      cx="49"
+      cy="30"
+      r="5"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    />
+
+    <path
+      d="M22 47C22 38 26 32 32 32C38 32 42 38 42 47"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M6 48C6 41 9 36 15 36C19 36 22 39 23 43"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M58 48C58 41 55 36 49 36C45 36 42 39 41 43"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+
+    <path
+      d="M15 54H49"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      opacity="0.5"
+    />
+  </svg>,
+
+  // Global Practices
+  <svg key="global" className="w-16 h-16" viewBox="0 0 64 64" fill="none">
+    <circle
+      cx="32"
+      cy="32"
+      r="24"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    />
+
+    <path
+      d="M8 32H56"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      opacity="0.6"
+    />
+
+    <path
+      d="M32 8C25 15 22 23 22 32C22 41 25 49 32 56"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      opacity="0.6"
+    />
+
+    <path
+      d="M32 8C39 15 42 23 42 32C42 41 39 49 32 56"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      opacity="0.6"
+    />
+
+    <path
+      d="M13 22H51M13 42H51"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      opacity="0.4"
+    />
+
+    <path
+      d="M32 4V8"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+  </svg>,
+];
 export default function ProgrammesPage() {
   return (
     <>
@@ -41,7 +174,7 @@ export default function ProgrammesPage() {
                 data-aos="fade-up" data-aos-delay={`${i * 120}`} data-aos-duration="800"
               >
                 <div className={`inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border w-fit mb-5 ${colorMap[p.color]}`}>
-                  <span>{p.icon}</span> {p.label}
+                 {p.label}
                 </div>
                 <h3 className="text-2xl font-bold text-midnight_text dark:text-white mb-3">{p.title}</h3>
                 <p className="text-sm font-medium text-primary mb-3">{p.subtitle}</p>
@@ -62,7 +195,7 @@ export default function ProgrammesPage() {
               Indigenous Movement for Addiction Recovery & Awareness — our frontline initiative delivering
               culturally responsive, community-driven care to Kenya's pastoralist and indigenous communities.
             </p>
-            <Link href="/treatments/community-outreach"
+            <Link href="/treatments/imara"
               className="inline-block bg-white text-primary font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
               Discover IMARA
             </Link>
