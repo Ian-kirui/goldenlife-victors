@@ -1,15 +1,15 @@
-import React, { Suspense } from 'react'
+import React, { Suspense } from "react";
 import { Metadata } from "next";
-import Hero from '@/components/Home/Hero';
-import Help from '@/components/Home/Help';
-import Causes from '@/components/Home/Causes';
-import FutureEvents from '@/components/Home/FutureEvents';
-import UrgentDonation from '@/components/Home/UrgentDonation';
-import Newsletter from '@/components/Home/NewsLetter';
-import Testimonial from '@/components/Home/Testimonial';
-import Volunteer from '@/components/SharedComponent/Volunteer';
-import UnauthorizedToast from '@/components/Common/UnauthorizedToast';
-import IMARABanner from '@/components/Home/IMARABanner/IMARABanner';
+import Hero from "@/components/Home/Hero";
+import Help from "@/components/Home/Help";
+import Causes from "@/components/Home/Causes";
+import FutureEvents from "@/components/Home/FutureEvents";
+import UrgentDonation from "@/components/Home/UrgentDonation";
+import Testimonial from "@/components/Home/Testimonial";
+import Volunteer from "@/components/SharedComponent/Volunteer";
+import UnauthorizedToast from "@/components/Common/UnauthorizedToast";
+import IMARABanner from "@/components/Home/IMARABanner/IMARABanner";
+import NewsletterWrapper from "@/components/Home/NewsLetter/NewsletterWrapper";
 
 export const metadata: Metadata = {
   title: "GoldenLife Victors | Mental Health & Wellness Organization",
@@ -76,9 +76,9 @@ export default function Home() {
       <Causes />
       <FutureEvents />
       <UrgentDonation />
-      <Newsletter />
+      <NewsletterWrapper />
       <Testimonial />
       <Volunteer />
     </main>
-  )
+  );
 }

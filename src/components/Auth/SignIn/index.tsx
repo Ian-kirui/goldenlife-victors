@@ -70,13 +70,13 @@ const Signin = ({ signInOpen }: { signInOpen?: any }) => {
       <div className="mb-10 text-center mx-auto inline-block max-w-[160px]">
         <Logo />
       </div>
-      <SocialSignIn />
+      {/* <SocialSignIn />
       <span className="z-1 relative my-8 block text-center">
         <span className="-z-1 absolute left-0 top-1/2 block h-px w-full bg-border dark:bg-dark_border" />
         <span className="text-body-secondary relative z-10 inline-block bg-white px-3 text-base dark:bg-dark">
           OR
         </span>
-      </span>
+      </span> */}
       <form onSubmit={handleSubmit}>
         {error && (
           <div className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">

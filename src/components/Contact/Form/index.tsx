@@ -1,96 +1,127 @@
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
+"use client";
 
-const ContactForm = () => {
+import { useState } from "react";
+import Image from "next/image";
+import { sendContactForm } from "@/utils/blogApi";
+import toast, { Toaster } from "react-hot-toast";
+
+export default function ContactForm() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+
+  const set =
+    (k: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm((p) => ({ ...p, [k]: e.target.value }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await sendContactForm(form);
+      toast.success("Message sent! We'll be in touch shortly.");
+      setForm({ name: "", email: "", subject: "", message: "" });
+    } catch (err: any) {
+      toast.error(err.message ?? "Failed to send. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const inputCls =
+    "w-full text-base px-4 py-3 rounded-lg border border-border dark:border-dark_border dark:text-white dark:bg-dark transition-all focus:border-primary dark:focus:border-primary focus:outline-none";
 
   return (
-    <>
-      <section className="dark:bg-dark pb-24">
-        <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) px-4">
-          <div className="grid lg:grid-cols-12 grid-cols-1 gap-8">
-            <div className="lg:col-span-6 lg:order-1 order-2">
-              <h2 className="max-w-72 text-[40px] leading-tight font-bold mb-9 text-midnight_text dark:text-white">Get online consultation</h2>
-              <form className="flex flex-wrap w-full m-auto justify-between">
-                <div className="sm:flex gap-3 w-full">
-                  <div className="mx-0 my-2.5 flex-1">
-                    <label htmlFor="first-name" className="pb-3 inline-block text-base">First Name*</label>
-                    <input id="first-name"
-                      className="w-full text-base px-4 rounded-lg py-2.5 border-border dark:border-dark_border border-solid dark:text-white  dark:bg-dark border transition-all duration-500 focus:border-primary dark:focus:border-primary focus:border-solid focus:outline-0"
-                      type="text"
-                    />
-                  </div>
-                  <div className="mx-0 my-2.5 flex-1">
-                    <label htmlFor="last-name" className="pb-3 inline-block text-base">Last Name*</label>
-                    <input id="last-name"
-                      className="w-full text-base px-4 py-2.5 rounded-lg border-border dark:border-dark_border border-solid dark:text-white  dark:bg-dark border transition-all duration-500 focus:border-primary dark:focus:border-primary focus:border-solid focus:outline-0"
-                      type="text"
-                    />
-                  </div>
+    <section className="dark:bg-dark pb-24">
+      <Toaster />
+      <div className="container mx-auto lg:max-w-(--breakpoint-xl) md:max-w-(--breakpoint-md) px-4">
+        <div className="grid lg:grid-cols-12 grid-cols-1 gap-8">
+          {/* Form */}
+          <div className="lg:col-span-6 lg:order-1 order-2">
+            <h2 className="max-w-72 text-[40px] leading-tight font-bold mb-9 text-midnight_text dark:text-white">
+              Get in Touch
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
+                <div>
+                  <label className="pb-2 inline-block text-base">Name *</label>
+                  <input
+                    required
+                    type="text"
+                    value={form.name}
+                    onChange={set("name")}
+                    placeholder="Your full name"
+                    className={inputCls}
+                  />
                 </div>
-                <div className="sm:flex gap-3 w-full">
-                  <div className="mx-0 my-2.5 flex-1">
-                    <label htmlFor="email" className="pb-3 inline-block text-base">Email address*</label>
-                    <input id="email"
-                      type="email"
-                      className="w-full text-base px-4 py-2.5 rounded-lg border-border dark:border-dark_border border-solid dark:text-white  dark:bg-dark border transition-all duration-500 focus:border-primary dark:focus:border-primary focus:border-solid focus:outline-0"
-                    />
-                  </div>
-                  <div className="mx-0 my-2.5 flex-1">
-                    <label htmlFor="SpecialistSpecialist" className="pb-3 inline-block text-base">Specialist*</label>
-                    <select id="SpecialistSpecialist" className="w-full text-base px-4 py-2.5 rounded-lg border-border dark:text-white border-solid dark:bg-dark border transition-all duration-500 focus:border-primary dark:focus:border-primary dark:border-dark_border focus:border-solid focus:outline-0">
-                      <option value="">Choose a specialist</option>
-                      <option value="Baking &amp; Pastry">
-                        Choose a specialist
-                      </option>
-                      <option value="Exotic Cuisine">Exotic Cuisine</option>
-                      <option value="French Desserts">French Desserts</option>
-                      <option value="Seafood &amp; Wine">
-                        Choose a specialist
-                      </option>
-                    </select>
-                  </div>
+                <div>
+                  <label className="pb-2 inline-block text-base">Email *</label>
+                  <input
+                    required
+                    type="email"
+                    value={form.email}
+                    onChange={set("email")}
+                    placeholder="your@email.com"
+                    className={inputCls}
+                  />
                 </div>
-                <div className="sm:flex gap-3 w-full">
-                  <div className="mx-0 my-2.5 flex-1">
-                    <label htmlFor="date" className="pb-3 inline-block text-base">Date*</label>
-                    <input id="date"
-                      className="w-full text-base px-4 rounded-lg  py-2.5 outline-hidden dark:text-white dark:bg-dark border-border border-solid border transition-all duration-500 focus:border-primary dark:focus:border-primary dark:border-dark_border focus:border-solid focus:outline-0"
-                      type="date"
-                    />
-                  </div>
-                  <div className="mx-0 my-2.5 flex-1">
-                    <label htmlFor="time" className="pb-3 inline-block text-base">Time*</label>
-                    <input
-                     id="time"
-                      className="w-full text-base px-4 rounded-lg py-2.5 border-border outline-hidden dark:text-white dark:bg-dark border-solid border transition-all duration-500 focus:border-primary dark:focus:border-primary dark:border-dark_border focus:border-solid focus:outline-0"
-                      type="time"
-                    />
-                  </div>
-                </div>
-                <div className="mx-0 my-2.5 w-full">
-                  <Link href="#" className="bg-linear-to-r from-primary to-secondary rounded-lg text-white py-4 px-8 mt-4 inline-block hover:from-transparent hover:to-transparent hover:text-primary border hover:border-primary" type="submit">
-                    Make an appointment
-                  </Link>
-                </div>
-              </form>
-            </div>
-            <div className="lg:col-span-6 lg:order-2 order-1">
-              <Image
-                src="/images/contact-page/contact.jpg"
-                alt="Contact"
-                width={1300}
-                height={0}
-                quality={100}
-                style={{ width: '100%', height: 'auto' }}
-                className="bg-no-repeat bg-contain"
-              />
-            </div>
+              </div>
+              <div>
+                <label className="pb-2 inline-block text-base">Subject</label>
+                <input
+                  type="text"
+                  value={form.subject}
+                  onChange={set("subject")}
+                  placeholder="How can we help?"
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className="pb-2 inline-block text-base">Message</label>
+                <textarea
+                  rows={5}
+                  value={form.message}
+                  onChange={set("message")}
+                  placeholder="Tell us more about your enquiry…"
+                  className={`${inputCls} resize-none`}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="bg-linear-to-r from-primary to-secondary rounded-lg text-white py-4 px-8 hover:from-transparent hover:to-transparent hover:text-primary border hover:border-primary disabled:opacity-50 flex items-center gap-2 transition-all"
+              >
+                {submitting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Sending…
+                  </>
+                ) : (
+                  "Send Message"
+                )}
+              </button>
+            </form>
+          </div>
+
+          {/* Image */}
+          <div className="lg:col-span-6 lg:order-2 order-1">
+            <Image
+              src="/images/all/religion.jpg"
+              alt="Contact GoldenLife Victors"
+              width={1300}
+              height={0}
+              quality={100}
+              style={{ width: "100%", height: "auto" }}
+              className="rounded-2xl"
+            />
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
-};
-
-export default ContactForm;
+}
