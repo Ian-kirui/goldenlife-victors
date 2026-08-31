@@ -51,6 +51,7 @@ export interface Event {
   authorId?: string;
   meetLink?: string | null;
   location?: string | null;
+  registrationLink?:string;
   dateCreated?: string;
 }
 
