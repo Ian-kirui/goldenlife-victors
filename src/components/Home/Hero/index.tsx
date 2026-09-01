@@ -114,10 +114,10 @@ export default function Hero() {
 
           <div className="flex justify-center gap-3">
             <Link
-              href="/programmes"
+              href="/treatments"
               className="text-white bg-linear-to-r text-sm from-error to-warning px-7 py-4 hover:from-white hover:to-white dark:hover:from-dark dark:hover:to-dark border font-semibold border-transparent hover:border-error hover:text-error rounded-md"
             >
-              Our Programmes
+              Treatments
             </Link>
             <Test />
           </div>
