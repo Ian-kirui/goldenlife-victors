@@ -12,13 +12,12 @@ export interface Category {
   postCount: number;
 }
 
-// ─── Comment (matches CommentDto from OpenAPI) ────────────────────────────────
+// ─── Comment ──────────────────────────────────────────────────────────────────
 export interface Comment {
   id: string;
   postId?: string;
   content: string;
-  authorName: string;   // flat field, not nested author object
-  authorEmail?: string;
+  authorName: string;
   status: "PENDING" | "APPROVED" | "REJECTED" | string;
   dateCreated?: string;
 }
@@ -32,27 +31,32 @@ export interface Post {
   postStatus: "DRAFT" | "PUBLISHED" | string;
   dateCreated?: string;
   readingTime?: number;
-  author?: {
-    id: string;
-    name: string;
-  };
+  author?: { id: string; name: string };
   category?: Category;
   tags?: Tag[];
-  comments?: Comment[];  // only present on PostDto_PostDetail (single post view)
+  comments?: Comment[];
 }
 
-// ─── Event (matches EventResponse from OpenAPI) ───────────────────────────────
+// ─── Event Image (new) ────────────────────────────────────────────────────────
+export interface EventImageResponse {
+  id: string;
+  url: string;
+  originalFilename: string;
+}
+
+// ─── Event ────────────────────────────────────────────────────────────────────
 export interface Event {
   id: string;
   title: string;
   content: string;
   status: "DRAFT" | "PUBLISHED" | string;
-  imageUrl?: string | null;
+  imageUrl?: string | null;        // banner/cover image
   authorId?: string;
   meetLink?: string | null;
   location?: string | null;
-  registrationLink?:string;
+  registrationLink?: string | null;
   dateCreated?: string;
+  images?: EventImageResponse[];   // post-event gallery images
 }
 
 // ─── API list wrappers ────────────────────────────────────────────────────────

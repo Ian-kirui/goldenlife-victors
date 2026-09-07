@@ -120,6 +120,28 @@ export default async function EventDetailPage({ params }: any) {
               <div className="blog-details markdown">
                 <div dangerouslySetInnerHTML={{ __html: event.content }} />
               </div>
+
+              {/* ── Post-event gallery ── */}
+              {event.images && event.images.length > 0 && (
+                <div className="mt-12">
+                  <h3 className="text-xl font-bold text-midnight_text dark:text-white mb-6">
+                    Event Gallery
+                  </h3>
+                  <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
+                    {event.images.map((img) => (
+                      <div key={img.id} className="rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={img.url}
+                          alt={img.originalFilename}
+                          className="w-full h-auto object-contain"
+                          loading="lazy"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div>
               <div className="bg-white dark:bg-[#1e2436] rounded-2xl border border-border dark:border-dark_border p-6 space-y-5 sticky top-28">

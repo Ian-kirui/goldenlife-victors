@@ -44,7 +44,7 @@ export default function ContactForm() {
           {/* Form */}
           <div className="lg:col-span-6 lg:order-1 order-2">
             <h2 className="max-w-72 text-[40px] leading-tight font-bold mb-9 text-midnight_text dark:text-white">
-              Get in Touch
+              Contact Us.
             </h2>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid sm:grid-cols-2 grid-cols-1 gap-4">

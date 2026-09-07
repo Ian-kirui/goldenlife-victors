@@ -6,6 +6,7 @@ import type {
   CategoriesResponse,
   TagsResponse,
   Event,
+  EventImageResponse,
   EventsResponse,
   Comment,
   CommentsResponse,
@@ -17,7 +18,9 @@ const BASE =
   "";
 
 const AUTH_BASE =
-  process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  process.env.API_BASE_URL ??
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -120,27 +123,18 @@ function unwrapEvents(raw: any): Event[] {
 
 export async function forgotPassword(email: string): Promise<void> {
   const res = await fetch(
-    `${AUTH_BASE}/api/auth/public/forgot-password?email=${encodeURIComponent(
-      email
-    )}`,
+    `${AUTH_BASE}/api/auth/public/forgot-password?email=${encodeURIComponent(email)}`,
     { method: "POST", cache: "no-store" }
   );
   if (!res.ok) {
     const body = await res.json().catch(() => null);
-    throw new Error(
-      body?.message ?? `Failed to send reset email (${res.status})`
-    );
+    throw new Error(body?.message ?? `Failed to send reset email (${res.status})`);
   }
 }
 
-export async function resetPassword(
-  token: string,
-  newPassword: string
-): Promise<void> {
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
   const res = await fetch(
-    `${AUTH_BASE}/api/auth/public/reset-password?token=${encodeURIComponent(
-      token
-    )}&newPassword=${encodeURIComponent(newPassword)}`,
+    `${AUTH_BASE}/api/auth/public/reset-password?token=${encodeURIComponent(token)}&newPassword=${encodeURIComponent(newPassword)}`,
     { method: "POST", cache: "no-store" }
   );
   if (!res.ok) {
@@ -153,9 +147,7 @@ export async function resetPassword(
 
 export async function getAllPublicPosts(): Promise<Post[]> {
   try {
-    const data = await apiFetch<PostsResponse | { content: Post[] }>(
-      "/posts/public"
-    );
+    const data = await apiFetch<PostsResponse | { content: Post[] }>("/posts/public");
     const raw = Array.isArray(data) ? data : (data as any).content ?? [];
     return normaliseAll(raw);
   } catch {
@@ -225,10 +217,7 @@ export async function getAdminPosts(
   }
 }
 
-export async function getAdminPostById(
-  token: string,
-  id: string
-): Promise<Post | null> {
+export async function getAdminPostById(token: string, id: string): Promise<Post | null> {
   try {
     const raw = await authFetch<any>(`/posts/admin/${id}`, token);
     return normalise(raw);
@@ -239,9 +228,7 @@ export async function getAdminPostById(
 
 export async function getPublishedPosts(): Promise<Post[]> {
   try {
-    const data = await freshFetch<PostsResponse | { content: Post[] }>(
-      "/posts/public"
-    );
+    const data = await freshFetch<PostsResponse | { content: Post[] }>("/posts/public");
     const raw = Array.isArray(data) ? data : (data as any).content ?? [];
     return normaliseAll(raw);
   } catch {
@@ -257,10 +244,7 @@ export interface CreatePostPayload {
   status: "DRAFT" | "PUBLISHED";
 }
 
-export async function createPost(
-  token: string,
-  payload: CreatePostPayload
-): Promise<Post> {
+export async function createPost(token: string, payload: CreatePostPayload): Promise<Post> {
   const raw = await authFetch<any>("/posts", token, {
     method: "POST",
     body: JSON.stringify(payload),
@@ -276,11 +260,7 @@ export interface UpdatePostPayload {
   postStatus?: "DRAFT" | "PUBLISHED";
 }
 
-export async function updatePost(
-  token: string,
-  postId: string,
-  payload: UpdatePostPayload
-): Promise<Post> {
+export async function updatePost(token: string, postId: string, payload: UpdatePostPayload): Promise<Post> {
   const raw = await authFetch<any>(`/posts/${postId}`, token, {
     method: "PUT",
     body: JSON.stringify(payload),
@@ -292,11 +272,7 @@ export async function deletePost(token: string, postId: string): Promise<void> {
   return authFetch<void>(`/posts/${postId}`, token, { method: "DELETE" });
 }
 
-export async function uploadPostImage(
-  token: string,
-  postId: string,
-  imageFile: File
-): Promise<Post> {
+export async function uploadPostImage(token: string, postId: string, imageFile: File): Promise<Post> {
   const formData = new FormData();
   formData.append("image", imageFile);
   const res = await fetch(`${BASE}/posts/${postId}/image`, {
@@ -313,31 +289,20 @@ export async function uploadPostImage(
 
 // ─── Admin: Categories ────────────────────────────────────────────────────────
 
-export async function createCategory(
-  token: string,
-  name: string
-): Promise<Category> {
+export async function createCategory(token: string, name: string): Promise<Category> {
   return authFetch<Category>("/categories", token, {
     method: "POST",
     body: JSON.stringify({ name }),
   });
 }
 
-export async function deleteCategory(
-  token: string,
-  categoryId: string
-): Promise<void> {
-  return authFetch<void>(`/categories/${categoryId}`, token, {
-    method: "DELETE",
-  });
+export async function deleteCategory(token: string, categoryId: string): Promise<void> {
+  return authFetch<void>(`/categories/${categoryId}`, token, { method: "DELETE" });
 }
 
 // ─── Admin: Tags ──────────────────────────────────────────────────────────────
 
-export async function createTags(
-  token: string,
-  names: string[]
-): Promise<Tag[]> {
+export async function createTags(token: string, names: string[]): Promise<Tag[]> {
   return authFetch<Tag[]>("/tags", token, {
     method: "POST",
     body: JSON.stringify({ names }),
@@ -384,10 +349,7 @@ export async function getAdminEvents(token: string): Promise<Event[]> {
   }
 }
 
-export async function getAdminEventById(
-  token: string,
-  id: string
-): Promise<Event | null> {
+export async function getAdminEventById(token: string, id: string): Promise<Event | null> {
   try {
     const raw = await authFetch<any>(`/events/admin/${id}`, token);
     return unwrapEvent(raw);
@@ -403,12 +365,10 @@ export interface CreateEventPayload {
   meetLink?: string;
   location?: string;
   registrationLink?: string;
+  imageIds?: string[];  // IDs from uploadEventGalleryImage
 }
 
-export async function createEvent(
-  token: string,
-  payload: CreateEventPayload
-): Promise<Event> {
+export async function createEvent(token: string, payload: CreateEventPayload): Promise<Event> {
   const raw = await authFetch<any>("/events/admin", token, {
     method: "POST",
     body: JSON.stringify(payload),
@@ -428,11 +388,7 @@ export async function updateEvent(
   return unwrapEvent(raw) as Event;
 }
 
-export async function uploadEventImage(
-  token: string,
-  eventId: string,
-  imageFile: File
-): Promise<Event> {
+export async function uploadEventImage(token: string, eventId: string, imageFile: File): Promise<Event> {
   const formData = new FormData();
   formData.append("image", imageFile);
   const res = await fetch(`${BASE}/events/${eventId}/image`, {
@@ -462,9 +418,7 @@ export async function createComment(
   });
   if (!res.ok) {
     const body = await res.json().catch(() => null);
-    throw new Error(
-      body?.message ?? `Failed to submit comment (${res.status})`
-    );
+    throw new Error(body?.message ?? `Failed to submit comment (${res.status})`);
   }
   const raw = await res.json();
   return raw.data ?? raw;
@@ -488,22 +442,37 @@ export async function getAdminComments(
   }
 }
 
-export async function approveComment(
-  token: string,
-  commentId: string
-): Promise<Comment> {
-  return authFetch<Comment>(`/comments/${commentId}/approve`, token, {
-    method: "PUT",
-  });
+export async function approveComment(token: string, commentId: string): Promise<Comment> {
+  return authFetch<Comment>(`/comments/${commentId}/approve`, token, { method: "PUT" });
 }
 
-export async function rejectComment(
+export async function rejectComment(token: string, commentId: string): Promise<Comment> {
+  return authFetch<Comment>(`/comments/${commentId}/reject`, token, { method: "PUT" });
+}
+
+// ─── Events: Gallery image upload ────────────────────────────────────────────
+// POST /events/admin/images/upload — upload one image to the repository,
+// returns EventImageResponse { id, url, originalFilename }.
+// The returned id is then passed as imageIds[] when creating/updating an event.
+export async function uploadEventGalleryImage(
   token: string,
-  commentId: string
-): Promise<Comment> {
-  return authFetch<Comment>(`/comments/${commentId}/reject`, token, {
-    method: "PUT",
+  imageFile: File
+): Promise<EventImageResponse> {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+  const res = await fetch(`${BASE}/events/admin/images/upload`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+    cache: "no-store",
   });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.message ?? `Gallery upload failed: ${res.status}`);
+  }
+  const raw = await res.json();
+  // Response: { status, message, data: EventImageResponse }
+  return raw.data ?? raw;
 }
 
 // ─── Contact Form ─────────────────────────────────────────────────────────────
