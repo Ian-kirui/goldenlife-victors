@@ -40,6 +40,10 @@ export default function EditEventPage() {
         setMeetLink(ev.meetLink ?? "");
         setEventStatus(ev.status as "DRAFT" | "PUBLISHED");
         setImagePreview(ev.imageUrl ?? null);
+        // Pre-populate gallery image IDs from existing event images
+        if (ev.images && ev.images.length > 0) {
+          setImageIds(ev.images.map((img) => img.id));
+        }
       }
       setLoading(false);
     });
@@ -150,7 +154,7 @@ export default function EditEventPage() {
           </div>
 
           <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-5">
-            <EventGalleryPicker token={token} selectedIds={imageIds} onChange={setImageIds} />
+            <EventGalleryPicker token={token} selectedIds={imageIds} onChange={setImageIds} existingImages={event.images ?? []} />
           </div>
 
           <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-5 space-y-4">

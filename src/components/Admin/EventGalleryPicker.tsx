@@ -9,12 +9,26 @@ interface EventGalleryPickerProps {
   token: string;
   selectedIds: string[];
   onChange: (ids: string[]) => void;
+  /** Pass existing event images when editing — pre-populates the grid */
+  existingImages?: EventImageResponse[];
 }
 
-export default function EventGalleryPicker({ token, selectedIds, onChange }: EventGalleryPickerProps) {
-  const [uploaded, setUploaded] = useState<EventImageResponse[]>([]);
+export default function EventGalleryPicker({
+  token,
+  selectedIds,
+  onChange,
+  existingImages = [],
+}: EventGalleryPickerProps) {
+  // Merge existing images with newly uploaded ones (deduplicate by id)
+  const [sessionUploaded, setSessionUploaded] = useState<EventImageResponse[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // All images visible in the picker = existing + newly uploaded this session
+  const allImages: EventImageResponse[] = [
+    ...existingImages,
+    ...sessionUploaded.filter((u) => !existingImages.some((e) => e.id === u.id)),
+  ];
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -24,7 +38,7 @@ export default function EventGalleryPicker({ token, selectedIds, onChange }: Eve
       const results = await Promise.all(
         files.map((f) => uploadEventGalleryImage(token, f))
       );
-      setUploaded((prev) => [...prev, ...results]);
+      setSessionUploaded((prev) => [...prev, ...results]);
       // Auto-select newly uploaded images
       onChange([...selectedIds, ...results.map((r) => r.id)]);
       toast.success(`${results.length} image${results.length > 1 ? "s" : ""} uploaded`);
@@ -58,9 +72,12 @@ export default function EventGalleryPicker({ token, selectedIds, onChange }: Eve
         {uploading ? (
           <><span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />Uploading…</>
         ) : (
-          <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>Upload Images</>
+          <>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Upload Images
+          </>
         )}
         <input
           ref={fileRef}
@@ -73,21 +90,27 @@ export default function EventGalleryPicker({ token, selectedIds, onChange }: Eve
         />
       </label>
 
-      {/* Image grid — pick which ones to attach to this event */}
-      {uploaded.length > 0 && (
+      {/* Image grid */}
+      {allImages.length > 0 ? (
         <div className="grid grid-cols-3 gap-3">
-          {uploaded.map((img) => {
+          {allImages.map((img) => {
             const selected = selectedIds.includes(img.id);
             return (
               <button
                 key={img.id}
                 type="button"
                 onClick={() => toggle(img.id)}
-                className={`relative rounded-lg overflow-hidden border-2 transition-all ${
-                  selected ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"
+                className={`relative rounded-lg overflow-hidden border-2 transition-all text-left ${
+                  selected
+                    ? "border-primary"
+                    : "border-transparent opacity-60 hover:opacity-100"
                 }`}
               >
-                <img src={img.url} alt={img.originalFilename} className="w-full h-24 object-cover" />
+                <img
+                  src={img.url}
+                  alt={img.originalFilename}
+                  className="w-full h-24 object-cover"
+                />
                 {selected && (
                   <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
                     <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,16 +118,14 @@ export default function EventGalleryPicker({ token, selectedIds, onChange }: Eve
                     </svg>
                   </div>
                 )}
-                <p className="text-xs text-gray-500 truncate px-1 py-0.5 bg-white dark:bg-gray-900">
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate px-1 py-0.5 bg-white dark:bg-gray-900">
                   {img.originalFilename}
                 </p>
               </button>
             );
           })}
         </div>
-      )}
-
-      {uploaded.length === 0 && (
+      ) : (
         <p className="text-xs text-gray-400">
           Upload images first, then select which ones to include in this event's gallery.
         </p>
