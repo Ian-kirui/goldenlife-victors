@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getAdminEventById, updateEvent, uploadEventImage } from "@/utils/blogApi";
 import type { Event } from "@/types/api.types";
 import RichTextEditor from "@/components/Admin/RichTextEditor";
@@ -24,6 +24,7 @@ export default function EditEventPage() {
   const [imageFile, setImageFile]     = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageIds, setImageIds]         = useState<string[]>([]);
+  const imageIdsRef = useRef<string[]>([]); // ref avoids stale closure in handleSubmit
   const [loading, setLoading]     = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -42,7 +43,9 @@ export default function EditEventPage() {
         setImagePreview(ev.imageUrl ?? null);
         // Pre-populate gallery image IDs from existing event images
         if (ev.images && ev.images.length > 0) {
-          setImageIds(ev.images.map((img) => img.id));
+          const ids = ev.images.map((img: any) => img.id);
+          setImageIds(ids);
+          imageIdsRef.current = ids;
         }
       }
       setLoading(false);
@@ -60,7 +63,7 @@ export default function EditEventPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await updateEvent(token, id, { title, content, location, meetLink, status: eventStatus, imageIds });
+      await updateEvent(token, id, { title, content, location, meetLink, status: eventStatus, imageIds: imageIdsRef.current });
       if (imageFile) {
         await uploadEventImage(token, id, imageFile).catch(() =>
           toast.error("Event updated but image upload failed")
@@ -154,7 +157,12 @@ export default function EditEventPage() {
           </div>
 
           <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-5">
-            <EventGalleryPicker token={token} selectedIds={imageIds} onChange={setImageIds} existingImages={event.images ?? []} />
+            <EventGalleryPicker
+                  token={token}
+                  selectedIds={imageIds}
+                  onChange={(ids) => { setImageIds(ids); imageIdsRef.current = ids; }}
+                  existingImages={event.images ?? []}
+                />
           </div>
 
           <div className="bg-white dark:bg-[#1e2436] rounded-xl border border-gray-100 dark:border-gray-800 p-5 space-y-4">
