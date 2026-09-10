@@ -63,7 +63,9 @@ export default function EditEventPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await updateEvent(token, id, { title, content, location, meetLink, status: eventStatus, imageIds: imageIdsRef.current });
+      const payload = { title, content, location, meetLink, status: eventStatus, imageIds: imageIdsRef.current };
+      console.log("[UpdateEvent] payload:", JSON.stringify(payload));
+      await updateEvent(token, id, payload);
       if (imageFile) {
         await uploadEventImage(token, id, imageFile).catch(() =>
           toast.error("Event updated but image upload failed")
