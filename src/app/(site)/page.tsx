@@ -3,64 +3,42 @@ import { Metadata } from "next";
 import Hero from "@/components/Home/Hero";
 import Help from "@/components/Home/Help";
 import Causes from "@/components/Home/Causes";
-import FutureEvents from "@/components/Home/FutureEvents";
 import UrgentDonation from "@/components/Home/UrgentDonation";
+import Newsletter from "@/components/Home/NewsLetter";
 import Testimonial from "@/components/Home/Testimonial";
 import Volunteer from "@/components/SharedComponent/Volunteer";
 import UnauthorizedToast from "@/components/Common/UnauthorizedToast";
 import IMARABanner from "@/components/Home/IMARABanner/IMARABanner";
-import NewsletterWrapper from "@/components/Home/NewsLetter/NewsletterWrapper";
 
 export const metadata: Metadata = {
   title: "GoldenLife Victors | Mental Health & Wellness Organization",
   description:
     "GoldenLife Victors is a world-class organization dedicated to promoting mental health, wellness, and recovery through compassionate care, community outreach, and global collaboration. Join us in building a world where mental health matters.",
   keywords: [
-    "GoldenLife Victors",
-    "mental health Kenya",
-    "rehabilitation center",
-    "community wellness programmes",
-    "Addiction recovery",
-    "psychological therapy",
-    "counseling services",
-    "mental health awareness",
-    "wellness programmes",
-    "mental health organization Africa",
-    "Adopt an Addict initiative",
-    "youth therapy",
-    "family therapy",
-    "spiritual healing program",
-    "corporate mental wellness",
+    "GoldenLife Victors", "mental health Kenya", "rehabilitation center",
+    "community wellness programmes", "Addiction recovery", "psychological therapy",
+    "counseling services", "mental health awareness", "wellness programmes",
+    "mental health organization Africa", "Adopt an Addict initiative",
+    "youth therapy", "family therapy", "spiritual healing program", "corporate mental wellness",
   ],
   authors: [{ name: "GoldenLife Victors" }],
   openGraph: {
     title: "GoldenLife Victors | Transforming Lives Through Mental Wellness",
-    description:
-      "Empowering communities through therapy, rehabilitation, and outreach programmes that promote holistic mental health and recovery. Be part of the movement towards mental wellness for all.",
-    url: "https://goldenlifevictors.org",
+    description: "Empowering communities through therapy, rehabilitation, and outreach programmes that promote holistic mental health and recovery. Be part of the movement towards mental wellness for all.",
+    url: "https://www.goldenlifekenya.org",
     siteName: "GoldenLife Victors",
-    images: [
-      {
-        url: "/images/og/og-banner.jpg",
-        width: 1200,
-        height: 630,
-        alt: "GoldenLife Victors Mental Health and Wellness",
-      },
-    ],
+    images: [{ url: "/images/og/og-banner.jpg", width: 1200, height: 630, alt: "GoldenLife Victors Mental Health and Wellness" }],
     locale: "en_KE",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "GoldenLife Victors | Promoting Mental Health & Wellness",
-    description:
-      "GoldenLife Victors provides compassionate mental health care, rehabilitation, and community wellness programmes across Africa.",
+    description: "GoldenLife Victors provides compassionate mental health care, rehabilitation, and community wellness programmes across Africa.",
     images: ["/images/og/og-banner.jpg"],
     creator: "@GoldenLifeVictors",
   },
-  alternates: {
-    canonical: "https://goldenlifevictors.org",
-  },
+  alternates: { canonical: "https://www.goldenlifekenya.org" },
 };
 
 export default function Home() {
@@ -68,15 +46,13 @@ export default function Home() {
     <main>
       <Hero />
       <IMARABanner />
-      {/* Suspense required because UnauthorizedToast uses useSearchParams() */}
       <Suspense fallback={null}>
         <UnauthorizedToast />
       </Suspense>
       <Help />
       <Causes />
-      <FutureEvents />
       <UrgentDonation />
-      <NewsletterWrapper />
+      <Newsletter />
       <Testimonial />
       <Volunteer />
     </main>

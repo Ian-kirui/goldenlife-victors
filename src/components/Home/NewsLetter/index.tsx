@@ -4,18 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { sendContactForm } from "@/utils/blogApi";
 import toast, { Toaster } from "react-hot-toast";
-import type { Post } from "@/types/api.types";
-import BlogCard from "./blogCard";
 
-// Newsletter receives posts as props — fetched by the Server Component parent
-interface NewsletterProps {
-  posts: Post[];
-}
-
-export default function Newsletter({ posts }: NewsletterProps) {
-  const [name, setName]         = useState("");
-  const [email, setEmail]       = useState("")
-  const [agreed, setAgreed]     = useState(false);
+export default function Newsletter() {
+  const [name, setName]       = useState("");
+  const [email, setEmail]     = useState("");
+  const [agreed, setAgreed]   = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,7 +37,8 @@ export default function Newsletter({ posts }: NewsletterProps) {
     <section className="lg:py-28 py-16 dark:bg-dark">
       <Toaster />
       <div className="container mx-auto lg:max-w-(--breakpoint-xl) px-4">
-        <div className="grid lg:grid-cols-2 grid-cols-1 lg:gap-44">
+        <div className="grid lg:grid-cols-2 grid-cols-1 gap-16 items-center">
+
           {/* Subscribe form */}
           <div data-aos="fade-left">
             <div className="mb-8">
@@ -60,44 +54,26 @@ export default function Newsletter({ posts }: NewsletterProps) {
             </div>
             <form onSubmit={handleSubmit}>
               <div className="mb-6">
-                <input
-                  type="text"
-                  required
-                  value={name}
+                <input type="text" required value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                  className={inputCls}
-                />
+                  placeholder="Your name" className={inputCls} />
               </div>
               <div className="mb-6">
-                <input
-                  type="email"
-                  required
-                  value={email}
+                <input type="email" required value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email address"
-                  className={inputCls}
-                />
+                  placeholder="Your email address" className={inputCls} />
               </div>
               <div className="flex justify-center mb-6">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="text-white bg-linear-to-r from-error to-warning px-7 py-4 dark:hover:from-dark hover:from-white hover:to-white dark:hover:to-dark border border-transparent hover:border-error hover:text-error rounded-sm w-full disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {submitting ? (
-                    <><span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />Subscribing…</>
-                  ) : "Subscribe"}
+                <button type="submit" disabled={submitting}
+                  className="text-white bg-linear-to-r from-error to-warning px-7 py-4 dark:hover:from-dark hover:from-white hover:to-white dark:hover:to-dark border border-transparent hover:border-error hover:text-error rounded-sm w-full disabled:opacity-50 flex items-center justify-center gap-2">
+                  {submitting
+                    ? <><span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />Subscribing…</>
+                    : "Subscribe"}
                 </button>
               </div>
               <div className="flex items-center gap-2 mb-6">
-                <input
-                  type="checkbox"
-                  name="condition"
-                  id="condition"
-                  checked={agreed}
-                  onChange={(e) => setAgreed(e.target.checked)}
-                />
+                <input type="checkbox" name="condition" id="condition"
+                  checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
                 <label htmlFor="condition" className="text-base text-muted dark:text-white/60">
                   I agree with the{" "}
                   <Link href="/terms" className="text-primary hover:underline">terms and conditions</Link>
@@ -106,22 +82,33 @@ export default function Newsletter({ posts }: NewsletterProps) {
             </form>
           </div>
 
-          {/* Latest posts */}
-          <div className="lg:mt-0 mt-8">
-            <div className="flex justify-between items-center border-b border-border dark:border-dark_border pb-6 mb-8">
-              <h4 className="text-base mb-0">Latest news at GoldenLife Victors</h4>
-              <Link href="/blog" className="text-error hover:text-warning text-base">View all</Link>
-            </div>
-            {posts.length === 0 ? (
-              <p className="text-gray-400 text-sm">No posts yet.</p>
-            ) : (
-              posts.map((blog) => (
-                <div key={blog.id} className="lg:mb-10 mb-6" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
-                  <BlogCard blog={blog} />
+          {/* Right side — CTA panel instead of blog posts */}
+          <div className="bg-primary rounded-2xl p-10 text-white" data-aos="fade-right">
+            <p className="text-xs font-bold uppercase tracking-widest text-white/70 mb-4">
+              Why Subscribe?
+            </p>
+            <h3 className="text-2xl font-bold mb-5">
+              Be part of the movement for mental wellness across Kenya
+            </h3>
+            <div className="space-y-4 mb-8">
+              {[
+                "Early access to upcoming events and community outreach programmes",
+                "Mental health resources, research, and expert insights",
+                "Updates from our IMARA field teams and rehabilitation facility",
+                "Opportunities to volunteer, partner, or sponsor a wellness initiative",
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white mt-2 shrink-0" />
+                  <p className="text-white/80 text-sm leading-relaxed">{item}</p>
                 </div>
-              ))
-            )}
+              ))}
+            </div>
+            <Link href="/blog"
+              className="inline-block border border-white text-white font-semibold px-6 py-3 rounded-lg hover:bg-white hover:text-primary transition-colors text-sm">
+              Read our latest blog posts →
+            </Link>
           </div>
+
         </div>
       </div>
     </section>
